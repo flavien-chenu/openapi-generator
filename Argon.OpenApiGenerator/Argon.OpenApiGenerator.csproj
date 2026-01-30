@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>10</LangVersion>
+        <IsRoslynComponent>true</IsRoslynComponent>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <Nullable>enable</Nullable>
+
+        <!-- NuGet Package configuration -->
+        <PackageId>Argon.OpenApiGenerator</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>Flavien Chenu</Authors>
+        <Description>Source generator for OpenAPI 3.1.1 - Generates DTOs and Controllers from OpenAPI schemas. Supports .NET 8, 9, 10+. Highly configurable with records/classes, validation attributes, and more.</Description>
+        <PackageTags>openapi;swagger;source-generator;dto;controller;aspnetcore;api;codegen;openapi3</PackageTags>
+        <PackageProjectUrl>https://github.com/argon/argon-openapi-generator</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/argon/argon-openapi-generator</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <DevelopmentDependency>true</DevelopmentDependency>
+        <NoPackageAnalysis>true</NoPackageAnalysis>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" PrivateAssets="all"/>
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all"/>
+        <PackageReference Include="Microsoft.OpenApi" Version="3.3.1" GeneratePathProperty="true" PrivateAssets="all"/>
+    </ItemGroup>
+
+    <PropertyGroup>
+        <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+    </PropertyGroup>
+
+    <Target Name="GetDependencyTargetPaths">
+        <ItemGroup>
+            <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_OpenApi)\lib\netstandard2.0\Microsoft.OpenApi.dll" IncludeRuntimeDependency="false"/>
+        </ItemGroup>
+    </Target>
+
+    <!-- Pack the generator DLL and dependencies -->
+    <ItemGroup>
+        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
+        <None Include="$(PKGMicrosoft_OpenApi)\lib\netstandard2.0\Microsoft.OpenApi.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="build\Argon.OpenApiGenerator.props" PackagePath="build" Pack="true"/>
+        <None Include="build\Argon.OpenApiGenerator.targets" PackagePath="build" Pack="true"/>
+        <None Include="build\Argon.OpenApiGenerator.xml" PackagePath="build" Pack="true"/>
+    </ItemGroup>
+</Project>
