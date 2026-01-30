@@ -22,7 +22,7 @@ public class OpenApiSourceGeneratorTests
     {
         // Obtenir le chemin du fichier OpenAPI de test
         var testDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        _testOpenApiFilePath = Path.Combine(testDirectory!, "TestData", "test-openapi.json");
+        _testOpenApiFilePath = Path.Combine(testDirectory!, "TestData", "test-openapi.yaml");
 
         // Créer le répertoire TestData s'il n'existe pas
         var testDataDir = Path.GetDirectoryName(_testOpenApiFilePath);
@@ -34,7 +34,7 @@ public class OpenApiSourceGeneratorTests
         // Copier le fichier de test s'il n'existe pas
         var sourceFile = Path.Combine(
             Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(testDirectory!))))!,
-            "TestProject1", "TestData", "test-openapi.json");
+            "TestProject1", "TestData", "test-openapi.yaml");
 
         if (File.Exists(sourceFile) && !File.Exists(_testOpenApiFilePath))
         {
@@ -64,8 +64,13 @@ public class OpenApiSourceGeneratorTests
                 ["build_metadata.AdditionalFiles.SourceItemType"] = "OpenApiGenerator",
                 ["build_metadata.AdditionalFiles.GenerateDtos"] = "true",
                 ["build_metadata.AdditionalFiles.GenerateControllers"] = "true",
-                ["build_metadata.AdditionalFiles.BaseNamespace"] = "TestNamespace",
-                ["build_metadata.AdditionalFiles.UseAsyncControllers"] = "true"
+                ["build_metadata.AdditionalFiles.BaseNamespace"] = "Argon.Identity.Web",
+                ["build_metadata.AdditionalFiles.UseAsyncControllers"] = "true",
+                ["build_metadata.AdditionalFiles.DtosNamespace"] = "Contracts",
+                ["build_metadata.AdditionalFiles.ControllersNamespace"] = "Controllers",
+                ["build_metadata.AdditionalFiles.GenerateValidationAttributes"] = "false",
+                ["build_metadata.AdditionalFiles.AddApiControllerAttribute"] = "false",
+                ["build_metadata.AdditionalFiles.ControllerBaseClass"] = "Argon.Identity.Web.Controllers.Api.ApiController"
             });
         
         // Act - Créer le générateur et l'exécuter

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Argon.OpenApiGenerator;
 
@@ -61,4 +61,9 @@ public class GeneratorConfiguration
     /// Add [ApiController] attribute on controllers.
     /// </summary>
     public bool AddApiControllerAttribute { get; set; } = true;
+    
+    /// <summary>
+    /// Base class for generated controllers. Default is "ControllerBase".
+    /// </summary>
+    public string ControllerBaseClass { get; set; } = "ControllerBase";
 }

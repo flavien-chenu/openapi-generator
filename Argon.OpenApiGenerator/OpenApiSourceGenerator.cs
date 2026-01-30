@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Argon.OpenApiGenerator.Controllers;
 using Argon.OpenApiGenerator.Dtos;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Text;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
+using Microsoft.OpenApi.YamlReader;
 
 namespace Argon.OpenApiGenerator;
 
@@ -55,10 +54,10 @@ public class OpenApiSourceGenerator : IIncrementalGenerator
                     GenerateXmlDocumentation = GetBool(item.Options, "GenerateXmlDocumentation", true),
                     UseAsyncControllers = GetBool(item.Options, "UseAsyncControllers", true),
                     AddApiControllerAttribute = GetBool(item.Options, "AddApiControllerAttribute", true),
-
                     BaseNamespace = GetString(item.Options, "BaseNamespace", "Generated"),
                     DtosNamespace = GetString(item.Options, "DtosNamespace", "Dtos"),
-                    ControllersNamespace = GetString(item.Options, "ControllersNamespace", "Controllers")
+                    ControllersNamespace = GetString(item.Options, "ControllersNamespace", "Controllers"),
+                    ControllerBaseClass = GetString(item.Options, "ControllerBaseClass", "ControllerBase")
                 });
             }
             return configurations;
@@ -110,7 +109,11 @@ public class OpenApiSourceGenerator : IIncrementalGenerator
         var fileName = Path.GetFileNameWithoutExtension(configuration.OpenApiFile);
 
         // Parse le document OpenAPI
-        var (document, diagnostic) = OpenApiDocument.LoadAsync(configuration.OpenApiFile, new OpenApiReaderSettings()).GetAwaiter().GetResult();
+        var settings = new OpenApiReaderSettings();
+        settings.AddYamlReader();
+        settings.AddJsonReader();
+
+        var (document, diagnostic) = OpenApiDocument.LoadAsync(configuration.OpenApiFile, settings).GetAwaiter().GetResult();
 
         if (document == null || diagnostic != null && diagnostic.Errors.Any())
         {
@@ -130,27 +133,13 @@ public class OpenApiSourceGenerator : IIncrementalGenerator
         if (configuration.GenerateDtos && document.Components?.Schemas != null)
         {
             var dtoGenerator = new DtoGenerator(configuration);
-            var dtoCode = dtoGenerator.Generate(document, fileName);
-        
-            if (!string.IsNullOrWhiteSpace(dtoCode))
-            {
-                context.AddSource(
-                    $"{fileName}.Dtos.g.cs",
-                    SourceText.From(dtoCode, Encoding.UTF8));
-            }
+            dtoGenerator.Generate(document, context);
         }
 
         // Generate controllers
         if (!configuration.GenerateControllers) return;
 
         var controllerGenerator = new ControllerGenerator(configuration);
-        var controllerCode = controllerGenerator.Generate(document, fileName);
-
-        if (!string.IsNullOrWhiteSpace(controllerCode))
-        {
-            context.AddSource(
-                $"{fileName}.Controllers.g.cs",
-                SourceText.From(controllerCode, Encoding.UTF8));
-        }
+        controllerGenerator.Generate(document, context);
     }
 }

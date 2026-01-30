@@ -1,0 +1,293 @@
+openapi: 3.1.1
+info:
+  title: Argon Identity
+  description: Argon Identity provides authentication and authorization services
+    for Argon applications.
+  version: "1"
+paths:
+  /v1/accounts/{accountId}:
+    get:
+      tags:
+        - Accounts
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/GetAccountResponse"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAccountResponse"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/GetAccountResponse"
+        "401":
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "403":
+          description: Forbidden
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "404":
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v1/accounts/me:
+    get:
+      deprecated: true
+      operationId: GetMyAccountV1
+      tags:
+        - Accounts
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/GetAccountResponse"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAccountResponse"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/GetAccountResponse"
+        "401":
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "422":
+          description: Unprocessable Entity
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v1/accounts:
+    post:
+      operationId: CreateAccountV1
+      tags:
+        - Accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAccountRequest"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/CreateAccountRequest"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/CreateAccountRequest"
+        required: true
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "401":
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v1/connect/authorize:
+    get:
+      tags:
+        - Authorization
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: { }
+    post:
+      tags:
+        - Authorization
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: { }
+  /v1/connect/token:
+    post:
+      tags:
+        - Authorization
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: { }
+  /v1/connect/end-session:
+    get:
+      tags:
+        - Authorization
+      responses:
+        "200":
+          description: OK
+components:
+  schemas:
+    AccountOriginDto:
+      required:
+        - id
+        - provider
+      type: object
+      properties:
+        id:
+          type: string
+        provider:
+          $ref: "#/components/schemas/AccountOriginProviderEnum"
+    AccountOriginProviderEnum:
+      enum:
+        - unknown
+        - directory
+        - system
+      type: string
+    CreateAccountRequest:
+      required:
+        - email
+        - firstName
+        - lastName
+        - origin
+      type: object
+      properties:
+        userName:
+          type:
+            - "null"
+            - string
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        sendEmailVerification:
+          type: boolean
+        disabled:
+          type: boolean
+        origin:
+          $ref: "#/components/schemas/AccountOriginDto"
+    GetAccountResponse:
+      required:
+        - id
+        - email
+        - emailVerified
+        - firstName
+        - lastName
+        - disabled
+        - origin
+        - createdAt
+        - updatedAt
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userName:
+          type:
+            - "null"
+            - string
+        email:
+          type: string
+        emailVerified:
+          type: boolean
+        firstName:
+          type: string
+        lastName:
+          type: string
+        disabled:
+          type: boolean
+        origin:
+          $ref: "#/components/schemas/AccountOriginDto"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type:
+            - "null"
+            - string
+        title:
+          type:
+            - "null"
+            - string
+        status:
+          pattern: ^-?(?:0|[1-9]\d*)$
+          type:
+            - "null"
+            - integer
+            - string
+          format: int32
+        detail:
+          type:
+            - "null"
+            - string
+        instance:
+          type:
+            - "null"
+            - string
