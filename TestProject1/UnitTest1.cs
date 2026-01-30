@@ -67,7 +67,7 @@ public class OpenApiSourceGeneratorTests
                 ["build_metadata.AdditionalFiles.BaseNamespace"] = "TestNamespace",
                 ["build_metadata.AdditionalFiles.UseAsyncControllers"] = "true"
             });
-
+        
         // Act - Créer le générateur et l'exécuter
         var generator = new OpenApiSourceGenerator();
 

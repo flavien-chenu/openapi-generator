@@ -132,7 +132,7 @@ public class DtoGenerator
         }
 
         // Type et nom de propriété
-        var csharpType = MapOpenApiTypeToCSharp(propertySchema, !isRequired);
+        var csharpType = TypeUtils.DetermineFinalType(propertySchema);
         var sanitizedName = SanitizeName(propertyName, pascalCase: true);
         var requiredModifier = isRequired ? "required " : string.Empty;
         

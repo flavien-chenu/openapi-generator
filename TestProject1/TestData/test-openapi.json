@@ -1045,14 +1045,7 @@
             ]
           },
           "lastConnection": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/PrintRelayConnectionInfoDto"
-              }
-            ]
+            "$ref": "#/components/schemas/PrintRelayConnectionInfoDto"
           },
           "liveInfo": {
             "oneOf": [
