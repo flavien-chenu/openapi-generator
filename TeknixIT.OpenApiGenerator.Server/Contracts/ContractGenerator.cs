@@ -6,16 +6,16 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.OpenApi;
 
-namespace Argon.OpenApiGenerator.Dtos;
+namespace TeknixIT.OpenApiGenerator.Server.Contracts;
 
 /// <summary>
-/// Generates C# DTOs from OpenAPI schema definitions.
+/// Generates C# Contracts from OpenAPI schema definitions.
 /// </summary>
-internal sealed class DtoGenerator
+internal sealed class ContractGenerator
 {
     private readonly GeneratorConfiguration _configuration;
 
-    public DtoGenerator(GeneratorConfiguration configuration)
+    public ContractGenerator(GeneratorConfiguration configuration)
     {
         _configuration = configuration;
     }
@@ -23,7 +23,7 @@ internal sealed class DtoGenerator
     #region Public Methods
 
     /// <summary>
-    /// Generates DTO code from an OpenAPI document.
+    /// Generates contract code from an OpenAPI document.
     /// </summary>
     /// <param name="document">The OpenAPI document containing schemas.</param>
     /// <param name="context">The source production context.</param>
@@ -94,8 +94,8 @@ internal sealed class DtoGenerator
     private void AppendNamespace(StringBuilder sb)
     {
         var fullNamespace = string.IsNullOrWhiteSpace(_configuration.BaseNamespace)
-            ? _configuration.DtosNamespace
-            : $"{_configuration.BaseNamespace}.{_configuration.DtosNamespace}";
+            ? _configuration.ContractsNamespace
+            : $"{_configuration.BaseNamespace}.{_configuration.ContractsNamespace}";
 
         sb.AppendLine($"namespace {fullNamespace};");
         sb.AppendLine();

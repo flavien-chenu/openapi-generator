@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Argon.OpenApiGenerator.Controllers;
-using Argon.OpenApiGenerator.Dtos;
+using TeknixIT.OpenApiGenerator.Server.Controllers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
+using TeknixIT.OpenApiGenerator.Server.Contracts;
 
-namespace Argon.OpenApiGenerator;
+namespace TeknixIT.OpenApiGenerator.Server;
 
 /// <summary>
 /// Incremental source generator that creates DTOs and controllers from OpenAPI specifications.
@@ -54,7 +54,7 @@ public class OpenApiSourceGenerator : IIncrementalGenerator
                 configurations.Add(new GeneratorConfiguration
                 {
                     OpenApiFile = item.Text.Path,
-                    GenerateDtos = GetBooleanOption(item.Options, Constants.MetadataKeys.GenerateDtos, true),
+                    GenerateContracts = GetBooleanOption(item.Options, Constants.MetadataKeys.GenerateContracts, true),
                     GenerateControllers = GetBooleanOption(item.Options, Constants.MetadataKeys.GenerateControllers, true),
                     UseRecords = GetBooleanOption(item.Options, Constants.MetadataKeys.UseRecords, true),
                     GenerateValidationAttributes = GetBooleanOption(item.Options, Constants.MetadataKeys.GenerateValidationAttributes, true),
@@ -62,7 +62,7 @@ public class OpenApiSourceGenerator : IIncrementalGenerator
                     UseAsyncControllers = GetBooleanOption(item.Options, Constants.MetadataKeys.UseAsyncControllers, true),
                     AddApiControllerAttribute = GetBooleanOption(item.Options, Constants.MetadataKeys.AddApiControllerAttribute, true),
                     BaseNamespace = GetStringOption(item.Options, Constants.MetadataKeys.BaseNamespace, Constants.Defaults.BaseNamespace),
-                    DtosNamespace = GetStringOption(item.Options, Constants.MetadataKeys.DtosNamespace, Constants.Defaults.DtosNamespace),
+                    ContractsNamespace = GetStringOption(item.Options, Constants.MetadataKeys.ContractsNamespace, Constants.Defaults.ContractsNamespace),
                     ControllersNamespace = GetStringOption(item.Options, Constants.MetadataKeys.ControllersNamespace, Constants.Defaults.ControllersNamespace),
                     ControllerBaseClass = GetStringOption(item.Options, Constants.MetadataKeys.ControllerBaseClass, Constants.Defaults.ControllerBaseClass)
                 });
@@ -157,9 +157,9 @@ public class OpenApiSourceGenerator : IIncrementalGenerator
         }
 
         // Generate DTOs
-        if (configuration.GenerateDtos && document.Components?.Schemas != null)
+        if (configuration.GenerateContracts && document.Components?.Schemas != null)
         {
-            var dtoGenerator = new DtoGenerator(configuration);
+            var dtoGenerator = new ContractGenerator(configuration);
             dtoGenerator.Generate(document, context);
         }
 

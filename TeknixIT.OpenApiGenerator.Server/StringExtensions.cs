@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace Argon.OpenApiGenerator;
+namespace TeknixIT.OpenApiGenerator.Server;
 
 /// <summary>
 /// Extension methods for string manipulation.
@@ -24,7 +24,7 @@ internal static class StringExtensions
 
         input = input.ToLower();
         var words = input.Split(new[] { '_', '-', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-        var result = string.Concat(words.Select(word => 
+        var result = string.Concat(words.Select(word =>
             char.ToUpperInvariant(word[0]) + word.Substring(1).ToLowerInvariant()));
         return result;
     }
@@ -44,9 +44,9 @@ internal static class StringExtensions
 
         var chars = input.SelectMany((c, i) =>
         {
-            if (!char.IsUpper(c)) 
+            if (!char.IsUpper(c))
                 return c.ToString();
-            
+
             var prefix = i > 0 ? "_" : "";
             return prefix + char.ToLowerInvariant(c);
         });

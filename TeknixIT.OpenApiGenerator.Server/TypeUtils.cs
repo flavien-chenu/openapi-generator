@@ -1,7 +1,7 @@
 using System.Linq;
 using Microsoft.OpenApi;
 
-namespace Argon.OpenApiGenerator;
+namespace TeknixIT.OpenApiGenerator.Server;
 
 /// <summary>
 /// Utility class for determining C# types from OpenAPI schema definitions.

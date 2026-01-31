@@ -1,4 +1,4 @@
-namespace Argon.OpenApiGenerator;
+namespace TeknixIT.OpenApiGenerator.Server;
 
 /// <summary>
 /// Constants used throughout the generator.
@@ -11,7 +11,7 @@ internal static class Constants
     public static class MetadataKeys
     {
         public const string SourceItemType = "build_metadata.AdditionalFiles.SourceItemType";
-        public const string GenerateDtos = "build_metadata.AdditionalFiles.GenerateDtos";
+        public const string GenerateContracts = "build_metadata.AdditionalFiles.GenerateContracts";
         public const string GenerateControllers = "build_metadata.AdditionalFiles.GenerateControllers";
         public const string UseRecords = "build_metadata.AdditionalFiles.UseRecords";
         public const string GenerateValidationAttributes = "build_metadata.AdditionalFiles.GenerateValidationAttributes";
@@ -19,7 +19,7 @@ internal static class Constants
         public const string UseAsyncControllers = "build_metadata.AdditionalFiles.UseAsyncControllers";
         public const string AddApiControllerAttribute = "build_metadata.AdditionalFiles.AddApiControllerAttribute";
         public const string BaseNamespace = "build_metadata.AdditionalFiles.BaseNamespace";
-        public const string DtosNamespace = "build_metadata.AdditionalFiles.DtosNamespace";
+        public const string ContractsNamespace = "build_metadata.AdditionalFiles.ContractsNamespace";
         public const string ControllersNamespace = "build_metadata.AdditionalFiles.ControllersNamespace";
         public const string ControllerBaseClass = "build_metadata.AdditionalFiles.ControllerBaseClass";
     }
@@ -31,7 +31,7 @@ internal static class Constants
     {
         public const string SourceItemTypeValue = "OpenApiGenerator";
         public const string BaseNamespace = "Generated";
-        public const string DtosNamespace = "Dtos";
+        public const string ContractsNamespace = "Contracts";
         public const string ControllersNamespace = "Controllers";
         public const string ControllerBaseClass = "ControllerBase";
     }

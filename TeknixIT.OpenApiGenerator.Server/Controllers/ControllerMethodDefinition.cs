@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 
-namespace Argon.OpenApiGenerator.Controllers;
+namespace TeknixIT.OpenApiGenerator.Server.Controllers;
 
 /// <summary>
 /// Represents the definition of a controller action method.

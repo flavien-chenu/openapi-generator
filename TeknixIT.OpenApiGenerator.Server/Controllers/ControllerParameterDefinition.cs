@@ -1,4 +1,4 @@
-namespace Argon.OpenApiGenerator.Controllers;
+namespace TeknixIT.OpenApiGenerator.Server.Controllers;
 
 /// <summary>
 /// Represents the definition of a controller action parameter.

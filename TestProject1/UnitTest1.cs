@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
-using Argon.OpenApiGenerator;
+using TeknixIT.OpenApiGenerator.Server;
 
 namespace TestProject1;
 
@@ -62,17 +62,17 @@ public class OpenApiSourceGeneratorTests
             new Dictionary<string, string>
             {
                 ["build_metadata.AdditionalFiles.SourceItemType"] = "OpenApiGenerator",
-                ["build_metadata.AdditionalFiles.GenerateDtos"] = "true",
+                ["build_metadata.AdditionalFiles.GenerateContracts"] = "true",
                 ["build_metadata.AdditionalFiles.GenerateControllers"] = "true",
-                ["build_metadata.AdditionalFiles.BaseNamespace"] = "Argon.Identity.Web",
+                ["build_metadata.AdditionalFiles.BaseNamespace"] = "TeknixIT.Identity.Web",
                 ["build_metadata.AdditionalFiles.UseAsyncControllers"] = "true",
-                ["build_metadata.AdditionalFiles.DtosNamespace"] = "Contracts",
+                ["build_metadata.AdditionalFiles.ContractsNamespace"] = "Contracts",
                 ["build_metadata.AdditionalFiles.ControllersNamespace"] = "Controllers",
                 ["build_metadata.AdditionalFiles.GenerateValidationAttributes"] = "false",
                 ["build_metadata.AdditionalFiles.AddApiControllerAttribute"] = "false",
-                ["build_metadata.AdditionalFiles.ControllerBaseClass"] = "Argon.Identity.Web.Controllers.Api.ApiController"
+                ["build_metadata.AdditionalFiles.ControllerBaseClass"] = "TeknixIT.Identity.Web.Controllers.Api.ApiController"
             });
-        
+
         // Act - Créer le générateur et l'exécuter
         var generator = new OpenApiSourceGenerator();
 

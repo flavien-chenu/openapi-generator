@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Argon.OpenApiGenerator.Controllers;
+namespace TeknixIT.OpenApiGenerator.Server.Controllers;
 
 /// <summary>
 /// Represents the definition of a generated controller.

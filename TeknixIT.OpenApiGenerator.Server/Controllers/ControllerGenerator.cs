@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.OpenApi;
 
-namespace Argon.OpenApiGenerator.Controllers;
+namespace TeknixIT.OpenApiGenerator.Server.Controllers;
 
 /// <summary>
 /// Generator for ASP.NET Core controllers from OpenAPI paths.
@@ -75,8 +75,8 @@ internal sealed class ControllerGenerator
     private void AppendUsings(StringBuilder sb)
     {
         var dtosNamespace = string.IsNullOrWhiteSpace(_configuration.BaseNamespace)
-            ? _configuration.DtosNamespace
-            : $"{_configuration.BaseNamespace}.{_configuration.DtosNamespace}";
+            ? _configuration.ContractsNamespace
+            : $"{_configuration.BaseNamespace}.{_configuration.ContractsNamespace}";
         var controllerBaseNamespaceComponents = _configuration.ControllerBaseClass.Split('.');
         var controllerBaseNamespace = string.Join(".", controllerBaseNamespaceComponents.Take(controllerBaseNamespaceComponents.Length - 1));
 
@@ -85,12 +85,12 @@ internal sealed class ControllerGenerator
         sb.AppendLine("using System.Threading.Tasks;");
         sb.AppendLine("using Microsoft.AspNetCore.Mvc;");
         sb.AppendLine($"using {dtosNamespace};");
-        
+
         if (!string.IsNullOrWhiteSpace(controllerBaseNamespace) && controllerBaseNamespace != _configuration.ControllersNamespace)
         {
             sb.AppendLine($"using {controllerBaseNamespace};");
         }
-        
+
         sb.AppendLine();
     }
 

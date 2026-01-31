@@ -1,4 +1,4 @@
-namespace Argon.OpenApiGenerator.Controllers;
+namespace TeknixIT.OpenApiGenerator.Server.Controllers;
 
 /// <summary>
 /// Specifies the source location of a controller parameter.

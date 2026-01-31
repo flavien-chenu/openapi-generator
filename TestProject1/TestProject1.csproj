@@ -25,7 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Argon.OpenApiGenerator\Argon.OpenApiGenerator.csproj" />
+      <ProjectReference Include="..\TeknixIT.OpenApiGenerator.Server\TeknixIT.OpenApiGenerator.Server.csproj" />
     </ItemGroup>
 
     <ItemGroup>

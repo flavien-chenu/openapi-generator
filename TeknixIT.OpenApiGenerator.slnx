@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="TeknixIT.OpenApiGenerator.Server/TeknixIT.OpenApiGenerator.Server.csproj" />
+  <Project Path="TestProject1/TestProject1.csproj" />
+</Solution>

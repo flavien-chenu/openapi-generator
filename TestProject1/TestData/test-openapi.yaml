@@ -1,8 +1,8 @@
 openapi: 3.1.1
 info:
-  title: Argon Identity
-  description: Argon Identity provides authentication and authorization services
-    for Argon applications.
+  title: TeknixIT Identity
+  description: TeknixIT Identity provides authentication and authorization services
+    for TeknixIT applications.
   version: "1"
 paths:
   /v1/accounts/{accountId}:
