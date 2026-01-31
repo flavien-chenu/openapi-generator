@@ -6,7 +6,7 @@ namespace Argon.OpenApiGenerator;
 /// <summary>
 /// Utility class for determining C# types from OpenAPI schema definitions.
 /// </summary>
-public static class TypeUtils
+internal static class TypeUtils
 {
     /// <summary>
     /// Determines if the schema represents a nullable type.

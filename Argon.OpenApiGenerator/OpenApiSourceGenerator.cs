@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Argon.OpenApiGenerator.Controllers;
 using Argon.OpenApiGenerator.Dtos;
@@ -8,19 +7,22 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
-using Microsoft.OpenApi.YamlReader;
 
 namespace Argon.OpenApiGenerator;
 
 /// <summary>
-/// Générateur incrémental pour créer des DTOs et contrôleurs à partir de schémas OpenAPI.
+/// Incremental source generator that creates DTOs and controllers from OpenAPI specifications.
 /// </summary>
 [Generator(LanguageNames.CSharp)]
 public class OpenApiSourceGenerator : IIncrementalGenerator
 {
+    /// <summary>
+    /// Initializes the incremental generator.
+    /// </summary>
+    /// <param name="context">The generator initialization context.</param>
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        // 1. On récupère les fichiers et leurs métadonnées
+        // Step 1: Retrieve additional files and their metadata
         var provider = context.AdditionalTextsProvider
             .Combine(context.AnalyzerConfigOptionsProvider)
             .Select((pair, _) =>
@@ -28,42 +30,48 @@ public class OpenApiSourceGenerator : IIncrementalGenerator
                 var text = pair.Left;
                 var options = pair.Right.GetOptions(text);
 
-                // On filtre : on ne prend que nos items "OpenApiGenerator"
-                if (!options.TryGetValue("build_metadata.AdditionalFiles.SourceItemType", out var type) || type != "OpenApiGenerator")
+                // Filter: only process items marked as "OpenApiGenerator"
+                if (!options.TryGetValue(Constants.MetadataKeys.SourceItemType, out var type)
+                    || type != Constants.Defaults.SourceItemTypeValue)
+                {
                     return null;
+                }
 
                 return new { Text = text, Options = options };
             })
             .Where(x => x != null);
 
-        // 2. On groupe tout pour créer une seule instance de GeneratorOptions
+        // Step 2: Collect all configurations
         var collectedConfigurations = provider.Collect().Select((items, _) =>
         {
             var configurations = new List<GeneratorConfiguration>();
 
             foreach (var item in items)
             {
-                if (item is null) continue;
+                if (item is null)
+                    continue;
+
                 configurations.Add(new GeneratorConfiguration
                 {
                     OpenApiFile = item.Text.Path,
-                    GenerateDtos = GetBool(item.Options, "GenerateDtos", true),
-                    GenerateControllers = GetBool(item.Options, "GenerateControllers", true),
-                    UseRecords = GetBool(item.Options, "UseRecords", true),
-                    GenerateValidationAttributes = GetBool(item.Options, "GenerateValidationAttributes", true),
-                    GenerateXmlDocumentation = GetBool(item.Options, "GenerateXmlDocumentation", true),
-                    UseAsyncControllers = GetBool(item.Options, "UseAsyncControllers", true),
-                    AddApiControllerAttribute = GetBool(item.Options, "AddApiControllerAttribute", true),
-                    BaseNamespace = GetString(item.Options, "BaseNamespace", "Generated"),
-                    DtosNamespace = GetString(item.Options, "DtosNamespace", "Dtos"),
-                    ControllersNamespace = GetString(item.Options, "ControllersNamespace", "Controllers"),
-                    ControllerBaseClass = GetString(item.Options, "ControllerBaseClass", "ControllerBase")
+                    GenerateDtos = GetBooleanOption(item.Options, Constants.MetadataKeys.GenerateDtos, true),
+                    GenerateControllers = GetBooleanOption(item.Options, Constants.MetadataKeys.GenerateControllers, true),
+                    UseRecords = GetBooleanOption(item.Options, Constants.MetadataKeys.UseRecords, true),
+                    GenerateValidationAttributes = GetBooleanOption(item.Options, Constants.MetadataKeys.GenerateValidationAttributes, true),
+                    GenerateXmlDocumentation = GetBooleanOption(item.Options, Constants.MetadataKeys.GenerateXmlDocumentation, true),
+                    UseAsyncControllers = GetBooleanOption(item.Options, Constants.MetadataKeys.UseAsyncControllers, true),
+                    AddApiControllerAttribute = GetBooleanOption(item.Options, Constants.MetadataKeys.AddApiControllerAttribute, true),
+                    BaseNamespace = GetStringOption(item.Options, Constants.MetadataKeys.BaseNamespace, Constants.Defaults.BaseNamespace),
+                    DtosNamespace = GetStringOption(item.Options, Constants.MetadataKeys.DtosNamespace, Constants.Defaults.DtosNamespace),
+                    ControllersNamespace = GetStringOption(item.Options, Constants.MetadataKeys.ControllersNamespace, Constants.Defaults.ControllersNamespace),
+                    ControllerBaseClass = GetStringOption(item.Options, Constants.MetadataKeys.ControllerBaseClass, Constants.Defaults.ControllerBaseClass)
                 });
             }
+
             return configurations;
         });
 
-        // Génère le code
+        // Step 3: Generate source code
         context.RegisterSourceOutput(collectedConfigurations, (spc, configurations) =>
         {
             foreach (var configuration in configurations)
@@ -75,71 +83,93 @@ public class OpenApiSourceGenerator : IIncrementalGenerator
                 catch (Exception ex)
                 {
                     spc.ReportDiagnostic(Diagnostic.Create(
-                        new DiagnosticDescriptor(
-                            "ARGON001",
-                            "Erreur de génération OpenAPI",
-                            $"Erreur lors du traitement de {configuration}: {ex.Message}",
-                            "Argon.OpenApiGenerator",
-                            DiagnosticSeverity.Error,
-                            isEnabledByDefault: true),
-                        Location.None));
+                        DiagnosticDescriptors.GenerationError,
+                        Location.None,
+                        configuration.OpenApiFile,
+                        ex.Message));
                 }
             }
         });
     }
 
-    private static bool GetBool(AnalyzerConfigOptions options, string key, bool defaultValue)
+    #region Helper Methods
+
+    /// <summary>
+    /// Gets a boolean configuration option value.
+    /// </summary>
+    /// <param name="options">The analyzer configuration options.</param>
+    /// <param name="key">The configuration key.</param>
+    /// <param name="defaultValue">The default value if the key is not found or invalid.</param>
+    /// <returns>The boolean configuration value.</returns>
+    private static bool GetBooleanOption(AnalyzerConfigOptions options, string key, bool defaultValue)
     {
-        return options.TryGetValue($"build_metadata.AdditionalFiles.{key}", out var s)
-            ? bool.TryParse(s, out var b) ? b : defaultValue
+        if (!options.TryGetValue(key, out var value))
+        {
+            return defaultValue;
+        }
+
+        return bool.TryParse(value, out var result) ? result : defaultValue;
+    }
+
+    /// <summary>
+    /// Gets a string configuration option value.
+    /// </summary>
+    /// <param name="options">The analyzer configuration options.</param>
+    /// <param name="key">The configuration key.</param>
+    /// <param name="defaultValue">The default value if the key is not found or empty.</param>
+    /// <returns>The string configuration value.</returns>
+    private static string GetStringOption(AnalyzerConfigOptions options, string key, string defaultValue)
+    {
+        return options.TryGetValue(key, out var value) && !string.IsNullOrWhiteSpace(value)
+            ? value
             : defaultValue;
     }
 
-    private static string GetString(AnalyzerConfigOptions options, string key, string defaultValue)
-    {
-        return options.TryGetValue($"build_metadata.AdditionalFiles.{key}", out var s) && !string.IsNullOrWhiteSpace(s)
-            ? s
-            : defaultValue;
-    }
+    #endregion
 
+    #region Code Generation
+
+    /// <summary>
+    /// Generates source code from a configuration.
+    /// </summary>
+    /// <param name="context">The source production context.</param>
+    /// <param name="configuration">The generator configuration.</param>
     private static void GenerateFromConfiguration(
         SourceProductionContext context,
         GeneratorConfiguration configuration)
     {
-        var fileName = Path.GetFileNameWithoutExtension(configuration.OpenApiFile);
-
-        // Parse le document OpenAPI
+        // Parse the OpenAPI document
         var settings = new OpenApiReaderSettings();
         settings.AddYamlReader();
         settings.AddJsonReader();
 
-        var (document, diagnostic) = OpenApiDocument.LoadAsync(configuration.OpenApiFile, settings).GetAwaiter().GetResult();
+        var (document, diagnostic) = OpenApiDocument.LoadAsync(configuration.OpenApiFile, settings)
+            .GetAwaiter()
+            .GetResult();
 
-        if (document == null || diagnostic != null && diagnostic.Errors.Any())
+        if (document == null || (diagnostic != null && diagnostic.Errors.Any()))
         {
             context.ReportDiagnostic(Diagnostic.Create(
-                new DiagnosticDescriptor(
-                    "ARGON002",
-                    "Document OpenAPI invalide",
-                    $"Impossible de parser le document OpenAPI: {configuration.OpenApiFile}",
-                    "Argon.OpenApiGenerator",
-                    DiagnosticSeverity.Warning,
-                    isEnabledByDefault: true),
-                Location.None));
+                DiagnosticDescriptors.InvalidDocument,
+                Location.None,
+                configuration.OpenApiFile));
             return;
         }
 
-        // Génère les DTOs
+        // Generate DTOs
         if (configuration.GenerateDtos && document.Components?.Schemas != null)
         {
             var dtoGenerator = new DtoGenerator(configuration);
             dtoGenerator.Generate(document, context);
         }
 
-        // Generate controllers
-        if (!configuration.GenerateControllers) return;
-
-        var controllerGenerator = new ControllerGenerator(configuration);
-        controllerGenerator.Generate(document, context);
+        // Generate Controllers
+        if (configuration.GenerateControllers)
+        {
+            var controllerGenerator = new ControllerGenerator(configuration);
+            controllerGenerator.Generate(document, context);
+        }
     }
+
+    #endregion
 }

@@ -48,4 +48,10 @@
         <None Include="build\Argon.OpenApiGenerator.targets" PackagePath="build" Pack="true"/>
         <None Include="build\Argon.OpenApiGenerator.xml" PackagePath="build" Pack="true"/>
     </ItemGroup>
+
+    <!-- Analyzer release tracking -->
+    <ItemGroup>
+        <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
+        <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
+    </ItemGroup>
 </Project>
