@@ -51,7 +51,7 @@
 
     <!-- Analyzer release tracking -->
     <ItemGroup>
-        <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
-        <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
+        <None Include="AnalyzerReleases.Shipped.md" />
+        <None Include="AnalyzerReleases.Unshipped.md" />
     </ItemGroup>
 </Project>

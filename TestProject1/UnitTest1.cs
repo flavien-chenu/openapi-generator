@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Reflection;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -61,7 +61,7 @@ public class OpenApiSourceGeneratorTests
             _testOpenApiFilePath,
             new Dictionary<string, string>
             {
-                ["build_metadata.AdditionalFiles.SourceItemType"] = "OpenApiGenerator",
+                ["build_metadata.AdditionalFiles.SourceItemType"] = "OpenApiGeneratorServer",
                 ["build_metadata.AdditionalFiles.GenerateContracts"] = "true",
                 ["build_metadata.AdditionalFiles.GenerateControllers"] = "true",
                 ["build_metadata.AdditionalFiles.BaseNamespace"] = "TeknixIT.Identity.Web",
@@ -70,7 +70,7 @@ public class OpenApiSourceGeneratorTests
                 ["build_metadata.AdditionalFiles.ControllersNamespace"] = "Controllers",
                 ["build_metadata.AdditionalFiles.GenerateValidationAttributes"] = "false",
                 ["build_metadata.AdditionalFiles.AddApiControllerAttribute"] = "false",
-                ["build_metadata.AdditionalFiles.ControllerBaseClass"] = "TeknixIT.Identity.Web.Controllers.Api.ApiController"
+                ["build_metadata.AdditionalFiles.ControllerBaseClass"] = "Argon.Identity.Web.Controllers.Api.ApiController"
             });
 
         // Act - Créer le générateur et l'exécuter

@@ -29,7 +29,7 @@ internal static class Constants
     /// </summary>
     public static class Defaults
     {
-        public const string SourceItemTypeValue = "OpenApiGenerator";
+        public const string SourceItemTypeValue = "OpenApiGeneratorServer";
         public const string BaseNamespace = "Generated";
         public const string ContractsNamespace = "Contracts";
         public const string ControllersNamespace = "Controllers";

@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using TeknixIT.OpenApiGenerator.Server.Controllers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
 using TeknixIT.OpenApiGenerator.Server.Contracts;
+using TeknixIT.OpenApiGenerator.Server.Controllers;
 
 namespace TeknixIT.OpenApiGenerator.Server;
 
