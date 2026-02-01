@@ -1,4 +1,6 @@
 <Solution>
+  <Folder Name="/Tests/">
+    <Project Path="tests/TestProject1/TestProject1.csproj" />
+  </Folder>
   <Project Path="src/TeknixIT.OpenApiGenerator.Server/TeknixIT.OpenApiGenerator.Server.csproj" />
-  <Project Path="tests/TestProject1/TestProject1.csproj" />
 </Solution>
