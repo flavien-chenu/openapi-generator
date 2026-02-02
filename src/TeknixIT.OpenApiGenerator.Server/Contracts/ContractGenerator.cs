@@ -123,7 +123,7 @@ internal sealed class ContractGenerator
         sb.AppendLine($"public enum {SanitizeName(enumName)}");
         sb.AppendLine("{");
 
-        var enumValues = schema.Enum?.ToList() ?? new List<JsonNode>();
+        var enumValues = schema.Enum?.ToList() ?? [];
         for (var i = 0; i < enumValues.Count; i++)
         {
             var value = enumValues[i].ToString();

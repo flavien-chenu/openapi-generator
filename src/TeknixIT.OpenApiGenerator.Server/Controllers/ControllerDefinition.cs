@@ -34,5 +34,5 @@ internal sealed class ControllerDefinition
     /// <summary>
     /// Gets or sets the list of controller action methods.
     /// </summary>
-    public List<ControllerMethodDefinition> Methods { get; set; } = new();
+    public List<ControllerMethodDefinition> Methods { get; set; } = [];
 }

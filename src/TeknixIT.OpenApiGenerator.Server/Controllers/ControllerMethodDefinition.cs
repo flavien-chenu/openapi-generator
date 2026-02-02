@@ -13,7 +13,7 @@ internal sealed record ControllerMethodDefinition
     /// </summary>
     public ControllerMethodDefinition()
     {
-        Parameters = new List<ControllerParameterDefinition>();
+        Parameters = [];
         ReturnType = string.Empty;
         Name = string.Empty;
         HttpMethod = HttpMethod.Get;

@@ -128,7 +128,7 @@ internal sealed class ControllerGenerator
 
             if (!groups.ContainsKey(controllerName))
             {
-                groups[controllerName] = new List<(string, IOpenApiPathItem)>();
+                groups[controllerName] = [];
             }
 
             groups[controllerName].Add((path.Key, path.Value));
@@ -154,7 +154,7 @@ internal sealed class ControllerGenerator
         }
 
         // Fallback: use the first segment of the path
-        var segments = pathKey.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+        var segments = pathKey.Split(['/'], StringSplitOptions.RemoveEmptyEntries);
         return segments.Length > 0
             ? SanitizeName(segments[0], pascalCase: true)
             : "Default";
@@ -170,7 +170,7 @@ internal sealed class ControllerGenerator
     {
         var definition = new ControllerDefinition(controllerName)
         {
-            Route = GetCommonPathPrefix(paths.Select(p => p.Path).ToList()),
+            Route = GetCommonPathPrefix([.. paths.Select(p => p.Path)]),
             Documentation = $"Controller for {controllerName}",
         };
 
@@ -191,7 +191,7 @@ internal sealed class ControllerGenerator
 
         foreach (var (path, pathItem) in paths)
         {
-            foreach (var operation in pathItem.Operations ?? new Dictionary<HttpMethod, OpenApiOperation>())
+            foreach (var operation in pathItem.Operations ?? [])
             {
                 methods.Add(GetMethodDefinition(controller, operation.Key, operation.Value, path, document));
             }
@@ -369,7 +369,7 @@ internal sealed class ControllerGenerator
         if (paths.Count == 1)
         {
             // For a single path, take everything except the last segment
-            var segments = paths[0].Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            var segments = paths[0].Split(['/'], StringSplitOptions.RemoveEmptyEntries);
             if (segments.Length <= 1)
             {
                 return string.Empty;
@@ -379,7 +379,7 @@ internal sealed class ControllerGenerator
 
         // Split all paths into segments
         var allSegments = paths
-            .Select(p => p.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries).ToList())
+            .Select(p => p.Split(['/'], StringSplitOptions.RemoveEmptyEntries).ToList())
             .ToList();
 
         var minSegments = allSegments.Min(s => s.Count);
@@ -481,12 +481,77 @@ internal sealed class ControllerGenerator
 
         sb.Append($"{indent}public abstract {taskWrapper}{method.ReturnType}{taskEnd} {method.Name}(");
 
-        var parameters = method.Parameters
-            .Select(param => $"{GetParameterAttribute(param.Source)}{param.Type} {param.Name}")
+        var sortedParameters = SortParametersByRequirement(method.Parameters);
+        var parameters = sortedParameters
+            .Select(FormatParameter)
             .ToList();
 
         sb.Append(string.Join(", ", parameters));
         sb.AppendLine(");");
+    }
+
+    /// <summary>
+    /// Sorts parameters according to C# rules: required parameters first, then optional parameters.
+    /// Within each group, parameters are ordered by: required non-nullable, required nullable, optional non-nullable, optional nullable.
+    /// </summary>
+    private static List<ControllerParameterDefinition> SortParametersByRequirement(List<ControllerParameterDefinition> parameters)
+    {
+        return parameters
+            .OrderBy(p => p.DefaultValue != null ? 1 : 0)  // Required first (no default), then optional (with default)
+            .ThenBy(p => !p.IsRequired ? 1 : 0)             // Required before not required
+            .ThenBy(p => p.Type.Contains("?") ? 1 : 0)      // Non-nullable before nullable
+            .ToList();
+    }
+
+    /// <summary>
+    /// Formats a parameter with its attributes, type, name and optional default value.
+    /// </summary>
+    private static string FormatParameter(ControllerParameterDefinition param)
+    {
+        var result = $"{GetParameterAttribute(param.Source)}{param.Type} {param.Name}";
+
+        if (param.DefaultValue != null)
+        {
+            // Format default value based on type
+            var defaultValue = FormatDefaultValue(param.DefaultValue, param.Type);
+            result += $" = {defaultValue}";
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Formats a default value according to the parameter type.
+    /// </summary>
+    private static string FormatDefaultValue(string value, string type)
+    {
+        // Handle null value
+        if (string.IsNullOrWhiteSpace(value) || value.Equals("null", StringComparison.OrdinalIgnoreCase))
+        {
+            return "null";
+        }
+
+        // String types need quotes
+        if (type == "string" || type == "string?")
+        {
+            return $"\"{value}\"";
+        }
+
+        // Boolean
+        if (type == "bool" || type == "bool?")
+        {
+            return bool.TryParse(value, out var boolValue) ? boolValue.ToString().ToLower() : "false";
+        }
+
+        // Numeric types - use as-is
+        if (type.StartsWith("int") || type.StartsWith("long") || type.StartsWith("decimal") || 
+            type.StartsWith("double") || type.StartsWith("float"))
+        {
+            return value;
+        }
+
+        // Default: return as-is
+        return value;
     }
 
     /// <summary>
@@ -514,12 +579,7 @@ internal sealed class ControllerGenerator
     /// </summary>
     private static string GetParameterType(IOpenApiParameter parameter)
     {
-        if (parameter.Schema == null)
-        {
-            return "string";
-        }
-
-        return TypeUtils.DetermineFinalType(parameter.Schema);
+        return parameter.Schema == null ? "string" : TypeUtils.DetermineFinalType(parameter.Schema);
     }
 
     /// <summary>
