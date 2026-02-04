@@ -64,7 +64,7 @@ public class OpenApiSourceGeneratorTests
                 ["build_metadata.AdditionalFiles.SourceItemType"] = "OpenApiGeneratorServer",
                 ["build_metadata.AdditionalFiles.GenerateContracts"] = "true",
                 ["build_metadata.AdditionalFiles.GenerateControllers"] = "true",
-                ["build_metadata.AdditionalFiles.BaseNamespace"] = "TeknixIT.Identity.Web",
+                ["build_metadata.AdditionalFiles.BaseNamespace"] = "Argon.Identity.Web",
                 ["build_metadata.AdditionalFiles.UseAsyncControllers"] = "true",
                 ["build_metadata.AdditionalFiles.ContractsNamespace"] = "Contracts",
                 ["build_metadata.AdditionalFiles.ControllersNamespace"] = "Controllers",

@@ -185,6 +185,147 @@ paths:
       responses:
         "200":
           description: OK
+  /v1/users/search:
+    get:
+      operationId: SearchUsers
+      tags:
+        - Users
+      summary: Search users with various parameter types to test parameter ordering
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: Required search query
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: Optional page number with default value
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          required: false
+          description: Optional page size with default value
+          schema:
+            type: integer
+            default: 10
+        - name: includeDisabled
+          in: query
+          required: false
+          description: Optional boolean with default value
+          schema:
+            type: boolean
+            default: false
+        - name: sortBy
+          in: query
+          required: false
+          description: Optional nullable string without default
+          schema:
+            type: string
+            nullable: true
+        - name: filterBy
+          in: query
+          required: true
+          description: Required filter parameter
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GetAccountResponse"
+  /v1/users/{userId}/profile:
+    put:
+      operationId: UpdateUserProfile
+      tags:
+        - Users
+      summary: Update user profile with mixed parameters
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: Required path parameter
+          schema:
+            type: string
+            format: uuid
+        - name: version
+          in: query
+          required: false
+          description: Optional version with default
+          schema:
+            type: integer
+            default: 1
+        - name: X-Request-ID
+          in: header
+          required: false
+          description: Optional request ID header
+          schema:
+            type: string
+            nullable: true
+        - name: force
+          in: query
+          required: true
+          description: Required force flag
+          schema:
+            type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAccountRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+  /v1/products/{productId}/items/{itemId}:
+    delete:
+      operationId: DeleteProductItem
+      tags:
+        - Products
+      summary: Delete with multiple path and query parameters
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: Required product ID
+          schema:
+            type: string
+        - name: itemId
+          in: path
+          required: true
+          description: Required item ID
+          schema:
+            type: integer
+        - name: reason
+          in: query
+          required: false
+          description: Optional reason with default
+          schema:
+            type: string
+            default: "user_request"
+        - name: cascade
+          in: query
+          required: false
+          description: Optional cascade flag with default
+          schema:
+            type: boolean
+            default: true
+        - name: confirmToken
+          in: query
+          required: true
+          description: Required confirmation token
+          schema:
+            type: string
+      responses:
+        "204":
+          description: No Content
 components:
   schemas:
     AccountOriginDto:
