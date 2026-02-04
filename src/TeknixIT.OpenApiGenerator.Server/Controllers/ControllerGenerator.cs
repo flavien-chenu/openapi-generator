@@ -229,6 +229,9 @@ internal sealed class ControllerGenerator
         AddOperationParameters(methodDefinition, operation);
         AddRequestBodyParameter(methodDefinition, operation, document);
 
+        // Sort parameters according to C# conventions (required before optional, etc.)
+        methodDefinition.Parameters = SortParametersByRequirement(methodDefinition.Parameters);
+
         return methodDefinition;
     }
 
@@ -481,8 +484,7 @@ internal sealed class ControllerGenerator
 
         sb.Append($"{indent}public abstract {taskWrapper}{method.ReturnType}{taskEnd} {method.Name}(");
 
-        var sortedParameters = SortParametersByRequirement(method.Parameters);
-        var parameters = sortedParameters
+        var parameters = method.Parameters
             .Select(FormatParameter)
             .ToList();
 
@@ -491,16 +493,51 @@ internal sealed class ControllerGenerator
     }
 
     /// <summary>
-    /// Sorts parameters according to C# rules: required parameters first, then optional parameters.
-    /// Within each group, parameters are ordered by: required non-nullable, required nullable, optional non-nullable, optional nullable.
+    /// Sorts parameters according to C# method signature conventions:
+    /// 1. Required non-nullable parameters
+    /// 2. Required nullable parameters
+    /// 3. Optional parameters (with default values)
+    /// Within each group, sorted by source: FromRoute, FromQuery, FromHeader, FromBody.
     /// </summary>
     private static List<ControllerParameterDefinition> SortParametersByRequirement(List<ControllerParameterDefinition> parameters)
     {
         return parameters
-            .OrderBy(p => p.DefaultValue != null ? 1 : 0)  // Required first (no default), then optional (with default)
-            .ThenBy(p => !p.IsRequired ? 1 : 0)             // Required before not required
-            .ThenBy(p => p.Type.Contains("?") ? 1 : 0)      // Non-nullable before nullable
+            .OrderBy(p => p.DefaultValue != null ? 1 : 0) // Parameters with default values last (optional)
+            .ThenBy(p => IsNullableType(p.Type) ? 1 : 0) // Non-nullable before nullable (within required group)
+            .ThenBy(GetParameterSortOrder) // Then by source (Path, Query, Header, Body)
             .ToList();
+    }
+
+    /// <summary>
+    /// Gets the sort order for a parameter based on its source (ASP.NET Core conventions).
+    /// </summary>
+    private static int GetParameterSortOrder(ControllerParameterDefinition param)
+    {
+        return param.Source switch
+        {
+            ControllerParameterSource.Path => 0, // FromRoute first
+            ControllerParameterSource.Query => 1, // FromQuery second
+            ControllerParameterSource.Header => 2, // FromHeader third
+            ControllerParameterSource.Body => 3, // FromBody last
+            _ => 4 // Others at the end
+        };
+    }
+
+    /// <summary>
+    /// Determines if a C# type string represents a nullable type.
+    /// </summary>
+    private static bool IsNullableType(string type)
+    {
+        if (string.IsNullOrWhiteSpace(type))
+            return false;
+
+        // Check for nullable value types (int?, bool?, etc.)
+        if (type.EndsWith("?") && !type.EndsWith(">?"))
+            return true;
+
+        // Check for nullable reference types in collections
+        // Don't consider ICollection<string?> as nullable, only string? itself
+        return false;
     }
 
     /// <summary>
@@ -544,7 +581,7 @@ internal sealed class ControllerGenerator
         }
 
         // Numeric types - use as-is
-        if (type.StartsWith("int") || type.StartsWith("long") || type.StartsWith("decimal") || 
+        if (type.StartsWith("int") || type.StartsWith("long") || type.StartsWith("decimal") ||
             type.StartsWith("double") || type.StartsWith("float"))
         {
             return value;

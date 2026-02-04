@@ -285,7 +285,9 @@ internal sealed class ContractGenerator
             return;
         }
 
-        sb.AppendLine($"{Constants.CodeGeneration.Indent}[RegularExpression(@\"{propertySchema.Pattern}\")]");
+        // Escape double quotes in the pattern for C# verbatim string
+        var escapedPattern = propertySchema.Pattern.Replace("\"", "\"\"");
+        sb.AppendLine($"{Constants.CodeGeneration.Indent}[RegularExpression(@\"{escapedPattern}\")]");
     }
 
     /// <summary>
