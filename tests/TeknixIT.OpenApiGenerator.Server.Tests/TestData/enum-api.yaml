@@ -1,0 +1,70 @@
+openapi: 3.0.0
+info:
+  title: Enum API
+  version: 1.0.0
+paths:
+  /orders:
+    post:
+      operationId: CreateOrder
+      tags:
+        - Orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+components:
+  schemas:
+    Order:
+      type: object
+      required:
+        - id
+        - status
+        - priority
+      properties:
+        id:
+          type: integer
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        priority:
+          $ref: '#/components/schemas/Priority'
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+    OrderRequest:
+      type: object
+      required:
+        - priority
+      properties:
+        priority:
+          $ref: '#/components/schemas/Priority'
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+    OrderStatus:
+      type: string
+      enum:
+        - Pending
+        - Processing
+        - Completed
+        - Cancelled
+    Priority:
+      type: string
+      enum:
+        - Low
+        - Medium
+        - High
+        - Urgent
+    PaymentMethod:
+      type: string
+      enum:
+        - CreditCard
+        - DebitCard
+        - PayPal
+        - BankTransfer

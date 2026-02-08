@@ -29,7 +29,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="TestData\test-openapi.yaml">
+      <None Update="TestData\*.yaml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

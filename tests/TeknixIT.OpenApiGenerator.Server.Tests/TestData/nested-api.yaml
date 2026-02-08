@@ -1,0 +1,65 @@
+openapi: 3.0.0
+info:
+  title: Nested Objects API
+  version: 1.0.0
+paths:
+  /companies:
+    post:
+      operationId: CreateCompany
+      tags:
+        - Companies
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Company'
+      responses:
+        '201':
+          description: Created
+components:
+  schemas:
+    Company:
+      type: object
+      required:
+        - name
+        - address
+      properties:
+        name:
+          type: string
+        address:
+          $ref: '#/components/schemas/Address'
+        employees:
+          type: array
+          items:
+            $ref: '#/components/schemas/Employee'
+    Address:
+      type: object
+      required:
+        - street
+        - city
+        - country
+      properties:
+        street:
+          type: string
+        city:
+          type: string
+        zipCode:
+          type: string
+        country:
+          type: string
+    Employee:
+      type: object
+      required:
+        - firstName
+        - lastName
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        position:
+          type: string
+        salary:
+          type: number
+          format: double
