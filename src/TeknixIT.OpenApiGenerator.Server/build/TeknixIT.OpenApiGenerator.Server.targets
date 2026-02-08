@@ -1,0 +1,38 @@
+<Project>
+  <ItemGroup>
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="SourceItemType"/>
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="GenerateControllers"/>
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="UseRecords"/>
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="BaseNamespace"/>
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="ContractsNamespace"/>
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="ControllersNamespace"/>
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="GenerateValidationAttributes"/>
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="GenerateXmlDocumentation"/>
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="UseAsyncControllers"/>
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="AddApiControllerAttribute"/>
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="ControllerBaseClass"/>
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="ControllerGroupingStrategy"/>
+
+  </ItemGroup>
+
+  <Target Name="_InjectTeknixITOpenApiItems" BeforeTargets="GenerateMSIL;GenerateCSharpWithAnalyzers">
+    <ItemGroup>
+      <AdditionalFiles Include="@(OpenApiGeneratorServer)"
+                       SourceItemType="OpenApiGeneratorServer"
+                       GenerateContracts="%(OpenApiGeneratorServer.GenerateContracts)"
+                       GenerateControllers="%(OpenApiGeneratorServer.GenerateControllers)"
+                       UseRecords="%(OpenApiGeneratorServer.UseRecords)"
+                       BaseNamespace="%(OpenApiGeneratorServer.BaseNamespace)"
+                       ContractsNamespace="%(OpenApiGeneratorServer.ContractsNamespace)"
+                       ControllersNamespace="%(OpenApiGeneratorServer.ControllersNamespace)"
+                       GenerateValidationAttributes="%(OpenApiGeneratorServer.GenerateValidationAttributes)"
+                       GenerateXmlDocumentation="%(OpenApiGeneratorServer.GenerateXmlDocumentation)"
+                       UseAsyncControllers="%(OpenApiGeneratorServer.UseAsyncControllers)"
+                       AddApiControllerAttribute="%(OpenApiGeneratorServer.AddApiControllerAttribute)"
+                       ControllerBaseClass="%(OpenApiGeneratorServer.ControllerBaseClass)"
+                       ControllerGroupingStrategy="%(OpenApiGeneratorServer.ControllerGroupingStrategy)"
+      />
+    </ItemGroup>
+  </Target>
+
+</Project>
