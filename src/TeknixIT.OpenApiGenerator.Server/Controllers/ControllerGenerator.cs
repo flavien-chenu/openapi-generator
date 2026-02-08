@@ -110,9 +110,9 @@ internal sealed class ControllerGenerator
     #endregion
 
     /// <summary>
-    /// Groups paths by controller based on tags or path segments.
+    /// Groups paths by controller based on the configured grouping strategy.
     /// </summary>
-    private static Dictionary<string, List<(string Path, IOpenApiPathItem PathItem)>> GroupPathsByController(
+    private Dictionary<string, List<(string Path, IOpenApiPathItem PathItem)>> GroupPathsByController(
         OpenApiPaths paths)
     {
         var groups = new Dictionary<string, List<(string, IOpenApiPathItem)>>();
@@ -138,9 +138,24 @@ internal sealed class ControllerGenerator
     }
 
     /// <summary>
-    /// Determines the controller name from a path and its operations.
+    /// Determines the controller name from a path and its operations based on the configured strategy.
     /// </summary>
-    private static string GetControllerName(string pathKey, IOpenApiPathItem pathItem)
+    private string GetControllerName(string pathKey, IOpenApiPathItem pathItem)
+    {
+        return _configuration.ControllerGroupingStrategy switch
+        {
+            ControllerGroupingStrategy.ByTag => GetControllerNameByTag(pathKey, pathItem),
+            ControllerGroupingStrategy.ByFirstPathSegment => GetControllerNameByFirstSegment(pathKey),
+            ControllerGroupingStrategy.ByPath => GetControllerNameByPath(pathKey),
+            _ => GetControllerNameByTag(pathKey, pathItem)
+        };
+    }
+
+    /// <summary>
+    /// Gets the controller name using the tag from the first operation.
+    /// Falls back to first path segment if no tag is found.
+    /// </summary>
+    private static string GetControllerNameByTag(string pathKey, IOpenApiPathItem pathItem)
     {
         // Use the tag from the first operation
         var firstOperation = pathItem.Operations?.FirstOrDefault().Value;
@@ -154,10 +169,36 @@ internal sealed class ControllerGenerator
         }
 
         // Fallback: use the first segment of the path
+        return GetControllerNameByFirstSegment(pathKey);
+    }
+
+    /// <summary>
+    /// Gets the controller name from the first segment of the path.
+    /// </summary>
+    private static string GetControllerNameByFirstSegment(string pathKey)
+    {
         var segments = pathKey.Split(['/'], StringSplitOptions.RemoveEmptyEntries);
         return segments.Length > 0
             ? SanitizeName(segments[0], pascalCase: true)
             : "Default";
+    }
+
+    /// <summary>
+    /// Gets the controller name from the full path (excluding parameters).
+    /// </summary>
+    private static string GetControllerNameByPath(string pathKey)
+    {
+        // Remove leading/trailing slashes and replace path separators with underscores
+        var cleanPath = pathKey.Trim('/');
+        
+        // Remove path parameters (e.g., {id}) and replace remaining slashes
+        var segments = cleanPath.Split(['/'], StringSplitOptions.RemoveEmptyEntries);
+        var sanitizedSegments = segments
+            .Where(s => !s.StartsWith("{") || !s.EndsWith("}"))
+            .Select(s => SanitizeName(s, pascalCase: true));
+        
+        var name = string.Join("", sanitizedSegments);
+        return !string.IsNullOrWhiteSpace(name) ? name : "Default";
     }
 
     /// <summary>

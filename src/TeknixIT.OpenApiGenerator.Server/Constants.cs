@@ -21,6 +21,7 @@ internal static class Constants
         public const string ContractsNamespace = "build_metadata.AdditionalFiles.ContractsNamespace";
         public const string ControllersNamespace = "build_metadata.AdditionalFiles.ControllersNamespace";
         public const string ControllerBaseClass = "build_metadata.AdditionalFiles.ControllerBaseClass";
+        public const string ControllerGroupingStrategy = "build_metadata.AdditionalFiles.ControllerGroupingStrategy";
     }
 
     /// <summary>

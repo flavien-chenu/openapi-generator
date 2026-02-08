@@ -1,4 +1,4 @@
-using System;
+using TeknixIT.OpenApiGenerator.Server.Controllers;
 
 namespace TeknixIT.OpenApiGenerator.Server;
 
@@ -61,4 +61,9 @@ public class GeneratorConfiguration
     /// Base class for generated controllers. Default is "ControllerBase".
     /// </summary>
     public string ControllerBaseClass { get; set; } = "ControllerBase";
+
+    /// <summary>
+    /// Strategy for grouping operations into controllers.
+    /// </summary>
+    public ControllerGroupingStrategy ControllerGroupingStrategy { get; set; } = ControllerGroupingStrategy.ByTag;
 }

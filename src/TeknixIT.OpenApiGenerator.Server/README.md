@@ -63,6 +63,7 @@ Customize generation with metadata:
     <UseAsyncControllers>true</UseAsyncControllers>
     <AddApiControllerAttribute>true</AddApiControllerAttribute>
     <ControllerBaseClass>ControllerBase</ControllerBaseClass>
+    <ControllerGroupingStrategy>ByTag</ControllerGroupingStrategy>
   </OpenApiGeneratorServer>
 </ItemGroup>
 ```
@@ -81,6 +82,7 @@ Customize generation with metadata:
 | `UseAsyncControllers` | `true` | Generate async controller methods |
 | `AddApiControllerAttribute` | `true` | Add [ApiController] attribute to controllers |
 | `ControllerBaseClass` | `ControllerBase` | Base class for generated controllers |
+| `ControllerGroupingStrategy` | `ByTag` | Strategy for grouping operations into controllers: `ByTag` (group by OpenAPI tags), `ByFirstPathSegment` (group by first path segment), or `ByPath` (one controller per path) |
 
 ## Example
 

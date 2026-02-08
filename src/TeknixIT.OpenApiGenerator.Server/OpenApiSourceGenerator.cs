@@ -63,7 +63,8 @@ public class OpenApiSourceGenerator : IIncrementalGenerator
                     BaseNamespace = GetStringOption(item.Options, Constants.MetadataKeys.BaseNamespace, Constants.Defaults.BaseNamespace),
                     ContractsNamespace = GetStringOption(item.Options, Constants.MetadataKeys.ContractsNamespace, Constants.Defaults.ContractsNamespace),
                     ControllersNamespace = GetStringOption(item.Options, Constants.MetadataKeys.ControllersNamespace, Constants.Defaults.ControllersNamespace),
-                    ControllerBaseClass = GetStringOption(item.Options, Constants.MetadataKeys.ControllerBaseClass, Constants.Defaults.ControllerBaseClass)
+                    ControllerBaseClass = GetStringOption(item.Options, Constants.MetadataKeys.ControllerBaseClass, Constants.Defaults.ControllerBaseClass),
+                    ControllerGroupingStrategy = GetEnumOption(item.Options, Constants.MetadataKeys.ControllerGroupingStrategy, ControllerGroupingStrategy.ByTag)
                 });
             }
 
@@ -122,6 +123,24 @@ public class OpenApiSourceGenerator : IIncrementalGenerator
         return options.TryGetValue(key, out var value) && !string.IsNullOrWhiteSpace(value)
             ? value
             : defaultValue;
+    }
+
+    /// <summary>
+    /// Gets an enum configuration option value.
+    /// </summary>
+    /// <param name="options">The analyzer configuration options.</param>
+    /// <param name="key">The configuration key.</param>
+    /// <param name="defaultValue">The default value if the key is not found or invalid.</param>
+    /// <returns>The enum configuration value.</returns>
+    private static TEnum GetEnumOption<TEnum>(AnalyzerConfigOptions options, string key, TEnum defaultValue)
+        where TEnum : struct
+    {
+        if (!options.TryGetValue(key, out var value))
+        {
+            return defaultValue;
+        }
+
+        return Enum.TryParse<TEnum>(value, true, out var result) ? result : defaultValue;
     }
 
     #endregion

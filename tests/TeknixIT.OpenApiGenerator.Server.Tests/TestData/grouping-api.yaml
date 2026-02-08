@@ -1,0 +1,65 @@
+openapi: 3.0.0
+info:
+  title: Controller Grouping Test API
+  version: 1.0.0
+paths:
+  /users:
+    get:
+      operationId: ListUsers
+      tags:
+        - Users
+      responses:
+        '200':
+          description: Success
+  /users/{id}:
+    get:
+      operationId: GetUser
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+  /products:
+    get:
+      operationId: ListProducts
+      tags:
+        - Products
+      responses:
+        '200':
+          description: Success
+  /products/{id}:
+    get:
+      operationId: GetProduct
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+  /orders/pending:
+    get:
+      operationId: ListPendingOrders
+      tags:
+        - Orders
+      responses:
+        '200':
+          description: Success
+  /orders/completed:
+    get:
+      operationId: ListCompletedOrders
+      tags:
+        - Orders
+      responses:
+        '200':
+          description: Success
