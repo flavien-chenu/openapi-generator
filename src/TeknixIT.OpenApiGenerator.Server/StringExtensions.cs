@@ -23,7 +23,12 @@ internal static class StringExtensions
             return input;
 
         input = input.ToLower();
-        var words = input.Split(new[] { '_', '-', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        var words = input.Split(new[]
+        {
+            '_',
+            '-',
+            ' '
+        }, StringSplitOptions.RemoveEmptyEntries);
         var result = string.Concat(words.Select(word =>
             char.ToUpperInvariant(word[0]) + word.Substring(1).ToLowerInvariant()));
         return result;

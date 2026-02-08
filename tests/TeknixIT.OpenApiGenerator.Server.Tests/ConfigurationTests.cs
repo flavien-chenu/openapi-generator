@@ -53,7 +53,7 @@ public class ConfigurationTests : TestBase
         using (Assert.EnterMultipleScope())
         {
             Assert.That(result.GeneratedSources.Any(s => s.HintName == "User.g.cs"), Is.True,
-                    "Contracts should be generated");
+                "Contracts should be generated");
             Assert.That(result.GeneratedSources.Any(s => s.HintName.EndsWith("Controller.g.cs")), Is.False,
                 "Controllers should not be generated");
         }

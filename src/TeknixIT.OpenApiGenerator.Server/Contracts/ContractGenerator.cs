@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json.Nodes;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.OpenApi;

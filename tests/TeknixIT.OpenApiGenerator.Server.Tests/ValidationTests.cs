@@ -1,5 +1,3 @@
-using Microsoft.CodeAnalysis;
-
 namespace TeknixIT.OpenApiGenerator.Server.Tests;
 
 /// <summary>
@@ -54,7 +52,7 @@ public class ValidationTests : TestBase
         using (Assert.EnterMultipleScope())
         {
             Assert.That(sourceText.Trim().Replace(" ", ""), Does.Not.Contain("[MinLength"),
-                    "MinLength attribute should not be present");
+                "MinLength attribute should not be present");
             Assert.That(sourceText.Trim().Replace(" ", ""), Does.Not.Contain("[MaxLength"),
                 "MaxLength attribute should not be present");
         }

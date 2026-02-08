@@ -75,12 +75,7 @@ public abstract class TestBase
         var runResult = driver.GetRunResult();
         var generatorResult = runResult.Results[0];
 
-        return new GeneratorRunResult
-        {
-            GeneratedSources = generatorResult.GeneratedSources,
-            Diagnostics = diagnostics,
-            Exception = generatorResult.Exception
-        };
+        return new GeneratorRunResult { GeneratedSources = generatorResult.GeneratedSources, Diagnostics = diagnostics, Exception = generatorResult.Exception };
     }
 
     private static CSharpCompilation CreateCompilation()
@@ -246,7 +241,7 @@ public abstract class TestBase
         using (Assert.EnterMultipleScope())
         {
             Assert.That(beforeIndex, Is.GreaterThanOrEqualTo(0),
-                    $"Line '{normalizedBefore}' not found in source");
+                $"Line '{normalizedBefore}' not found in source");
             Assert.That(afterIndex, Is.GreaterThan(beforeIndex),
                 $"Line '{normalizedAfter}' should appear after '{normalizedBefore}'\n" +
                 $"In source:\n{source}");

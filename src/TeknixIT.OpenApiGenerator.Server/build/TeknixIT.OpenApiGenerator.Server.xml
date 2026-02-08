@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <Rule Name="OpenApiGeneratorServer"
       DisplayName="OpenAPI Server generator"
       PageTemplate="generic"
@@ -19,7 +20,8 @@
 
     <BoolProperty Name="GenerateControllers" Category="Generation" DisplayName="Generate controllers" />
     <BoolProperty Name="UseRecords" Category="Generation" DisplayName="Use C# Records" />
-    <BoolProperty Name="GenerateValidationAttributes" Category="Generation" DisplayName="Generate validation attributes" />
+    <BoolProperty Name="GenerateValidationAttributes" Category="Generation"
+                  DisplayName="Generate validation attributes" />
     <BoolProperty Name="GenerateXmlDocumentation" Category="Generation" DisplayName="Generate XML documentation" />
     <BoolProperty Name="UseAsyncControllers" Category="Generation" DisplayName="Use async controllers" />
     <BoolProperty Name="AddApiControllerAttribute" Category="Generation" DisplayName="Add [ApiController]" />
@@ -28,10 +30,14 @@
     <StringProperty Name="ContractsNamespace" Category="Naming" DisplayName="Contracts namespace" />
     <StringProperty Name="ControllersNamespace" Category="Naming" DisplayName="Controllers namespace" />
 
-    <StringProperty Name="ControllerBaseClass" Category="Controllers" DisplayName="Controller base class" Description="The base class for generated controllers (default: ControllerBase)" />
-    <EnumProperty Name="ControllerGroupingStrategy" Category="Controllers" DisplayName="Controller grouping strategy" Description="Strategy for grouping operations into controllers">
+    <StringProperty Name="ControllerBaseClass" Category="Controllers" DisplayName="Controller base class"
+                    Description="The base class for generated controllers (default: ControllerBase)" />
+    <EnumProperty Name="ControllerGroupingStrategy" Category="Controllers" DisplayName="Controller grouping strategy"
+                  Description="Strategy for grouping operations into controllers">
         <EnumValue Name="ByTag" DisplayName="By Tag" Description="Group operations by their OpenAPI tags (default)" />
-        <EnumValue Name="ByFirstPathSegment" DisplayName="By First Path Segment" Description="Group operations by the first segment of their path" />
-        <EnumValue Name="ByPath" DisplayName="By Path" Description="Create one controller per unique path (excluding parameters)" />
+        <EnumValue Name="ByFirstPathSegment" DisplayName="By First Path Segment"
+                   Description="Group operations by the first segment of their path" />
+        <EnumValue Name="ByPath" DisplayName="By Path"
+                   Description="Create one controller per unique path (excluding parameters)" />
     </EnumProperty>
 </Rule>

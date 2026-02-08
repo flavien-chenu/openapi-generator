@@ -1,22 +1,22 @@
 <Project>
-    <ItemDefinitionGroup>
-        <OpenApiGeneratorServer>
-            <GenerateContracts>true</GenerateContracts>
-            <GenerateControllers>true</GenerateControllers>
-            <UseRecords>true</UseRecords>
-            <BaseNamespace>Generated</BaseNamespace>
-            <ContractsNamespace>Contracts</ContractsNamespace>
-            <ControllersNamespace>Controllers</ControllersNamespace>
-            <GenerateValidationAttributes>true</GenerateValidationAttributes>
-            <GenerateXmlDocumentation>true</GenerateXmlDocumentation>
-            <UseAsyncControllers>true</UseAsyncControllers>
-            <AddApiControllerAttribute>true</AddApiControllerAttribute>
-            <ControllerBaseClass>ControllerBase</ControllerBaseClass>
-            <ControllerGroupingStrategy>ByTag</ControllerGroupingStrategy>
-        </OpenApiGeneratorServer>
-    </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <OpenApiGeneratorServer>
+      <GenerateContracts>true</GenerateContracts>
+      <GenerateControllers>true</GenerateControllers>
+      <UseRecords>true</UseRecords>
+      <BaseNamespace>Generated</BaseNamespace>
+      <ContractsNamespace>Contracts</ContractsNamespace>
+      <ControllersNamespace>Controllers</ControllersNamespace>
+      <GenerateValidationAttributes>true</GenerateValidationAttributes>
+      <GenerateXmlDocumentation>true</GenerateXmlDocumentation>
+      <UseAsyncControllers>true</UseAsyncControllers>
+      <AddApiControllerAttribute>true</AddApiControllerAttribute>
+      <ControllerBaseClass>ControllerBase</ControllerBaseClass>
+      <ControllerGroupingStrategy>ByTag</ControllerGroupingStrategy>
+    </OpenApiGeneratorServer>
+  </ItemDefinitionGroup>
 
-    <ItemGroup>
-        <PropertyPageSchema Include="$(MSBuildThisFileDirectory)TeknixIT.OpenApiGenerator.Server.xml" />
-    </ItemGroup>
+  <ItemGroup>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)TeknixIT.OpenApiGenerator.Server.xml" />
+  </ItemGroup>
 </Project>

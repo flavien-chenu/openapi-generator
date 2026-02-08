@@ -1,5 +1,3 @@
-using Microsoft.CodeAnalysis;
-
 namespace TeknixIT.OpenApiGenerator.Server.Tests;
 
 /// <summary>

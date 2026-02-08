@@ -211,8 +211,7 @@ internal sealed class ControllerGenerator
     {
         var definition = new ControllerDefinition(controllerName)
         {
-            Route = GetCommonPathPrefix([.. paths.Select(p => p.Path)]),
-            Documentation = $"Controller for {controllerName}",
+            Route = GetCommonPathPrefix([.. paths.Select(p => p.Path)]), Documentation = $"Controller for {controllerName}",
         };
 
         definition.Methods = GetMethodsDefinition(definition, paths, document);
