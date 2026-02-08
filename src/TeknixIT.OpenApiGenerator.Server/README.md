@@ -53,7 +53,6 @@ Customize generation with metadata:
 ```xml
 <ItemGroup>
   <OpenApiGeneratorServer Include="openapi.yaml">
-    <GenerateContracts>true</GenerateContracts>
     <GenerateControllers>true</GenerateControllers>
     <UseRecords>true</UseRecords>
     <BaseNamespace>MyApp.Generated</BaseNamespace>
@@ -72,7 +71,6 @@ Customize generation with metadata:
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `GenerateContracts` | `true` | Generate DTO classes/records |
 | `GenerateControllers` | `true` | Generate controller stubs |
 | `UseRecords` | `true` | Use records instead of classes for DTOs |
 | `BaseNamespace` | `Generated` | Root namespace for generated code |

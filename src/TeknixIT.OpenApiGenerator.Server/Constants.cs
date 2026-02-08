@@ -11,7 +11,6 @@ internal static class Constants
     public static class MetadataKeys
     {
         public const string SourceItemType = "build_metadata.AdditionalFiles.SourceItemType";
-        public const string GenerateContracts = "build_metadata.AdditionalFiles.GenerateContracts";
         public const string GenerateControllers = "build_metadata.AdditionalFiles.GenerateControllers";
         public const string UseRecords = "build_metadata.AdditionalFiles.UseRecords";
         public const string GenerateValidationAttributes = "build_metadata.AdditionalFiles.GenerateValidationAttributes";

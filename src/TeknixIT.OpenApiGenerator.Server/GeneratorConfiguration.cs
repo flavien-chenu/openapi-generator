@@ -13,11 +13,6 @@ public class GeneratorConfiguration
     public string OpenApiFile { get; set; } = string.Empty;
 
     /// <summary>
-    /// Generate DTOs if true.
-    /// </summary>
-    public bool GenerateContracts { get; set; } = true;
-
-    /// <summary>
     /// Generate controllers if true.
     /// </summary>
     public bool GenerateControllers { get; set; } = true;

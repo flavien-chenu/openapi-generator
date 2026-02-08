@@ -54,7 +54,6 @@ public class OpenApiSourceGenerator : IIncrementalGenerator
                 configurations.Add(new GeneratorConfiguration
                 {
                     OpenApiFile = item.Text.Path,
-                    GenerateContracts = GetBooleanOption(item.Options, Constants.MetadataKeys.GenerateContracts, true),
                     GenerateControllers = GetBooleanOption(item.Options, Constants.MetadataKeys.GenerateControllers, true),
                     UseRecords = GetBooleanOption(item.Options, Constants.MetadataKeys.UseRecords, true),
                     GenerateValidationAttributes = GetBooleanOption(item.Options, Constants.MetadataKeys.GenerateValidationAttributes, true),
@@ -156,8 +155,8 @@ public class OpenApiSourceGenerator : IIncrementalGenerator
             return;
         }
 
-        // Generate DTOs
-        if (configuration.GenerateContracts && document.Components?.Schemas != null)
+        // Generate contracts
+        if (document.Components?.Schemas != null)
         {
             var dtoGenerator = new ContractGenerator(configuration);
             dtoGenerator.Generate(document, context);
