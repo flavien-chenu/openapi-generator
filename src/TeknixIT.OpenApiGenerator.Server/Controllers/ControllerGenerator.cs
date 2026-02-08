@@ -251,7 +251,10 @@ internal sealed class ControllerGenerator
         string path,
         OpenApiDocument document)
     {
-        var route = path.Replace(controller.Route, string.Empty);
+        var route = controller.Route.Length > 0
+            ? path.Replace(controller.Route, string.Empty)
+            : path;
+        
         if (controller.Route.Length > 0)
         {
             route = ConvertPathToRouteTemplate(route);
