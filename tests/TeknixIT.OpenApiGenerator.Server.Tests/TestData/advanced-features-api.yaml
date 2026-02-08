@@ -1,0 +1,82 @@
+openapi: 3.0.0
+info:
+  title: Advanced Features API
+  version: 1.0.0
+paths:
+  /resources:
+    post:
+      operationId: CreateResource
+      tags:
+        - Resources
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Resource'
+      responses:
+        '200':
+          description: Success
+components:
+  schemas:
+    BaseEntity:
+      type: object
+      required:
+        - id
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+
+    Resource:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntity'
+        - type: object
+          required:
+            - name
+            - status
+          properties:
+            name:
+              type: string
+              minLength: 1
+              maxLength: 100
+            description:
+              type: string
+              nullable: true
+            status:
+              type: string
+              enum:
+                - Active
+                - Inactive
+                - Pending
+            metadata:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: string
+
+    NullableTypesModel:
+      type: object
+      required:
+        - requiredString
+        - requiredInt
+      properties:
+        requiredString:
+          type: string
+        requiredInt:
+          type: integer
+        nullableString:
+          oneOf:
+            - type: string
+            - type: 'null'
+        nullableInt:
+          oneOf:
+            - type: integer
+            - type: 'null'
+        nullableNumber:
+          type: number
+          nullable: true

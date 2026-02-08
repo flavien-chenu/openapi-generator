@@ -59,4 +59,53 @@ public class ValidationTests : TestBase
                 "MaxLength attribute should not be present");
         }
     }
+
+    [Test]
+    public void ValidationApi_ShouldGenerateRegularExpressionAttribute()
+    {
+        // Arrange
+        var openApiFile = Path.Combine(TestDataDirectory, "validation-api.yaml");
+        var config = CreateDefaultConfiguration();
+        config["build_metadata.AdditionalFiles.GenerateValidationAttributes"] = "true";
+
+        // Act
+        var result = RunGenerator(openApiFile, config);
+
+        // Assert
+        AssertNoErrors(result);
+        var validationModel = GetGeneratedSource(result, "ValidationModel.g.cs");
+        var sourceText = validationModel.SourceText.ToString();
+
+        // Check for RegularExpression attribute with escaped pattern
+        Assert.That(sourceText, Does.Contain("[RegularExpression(@\"^\\+?[1-9]\\d{1,14}$\")]"),
+            "RegularExpression attribute should be present with correct pattern");
+
+        AssertContainsLinesInOrder(sourceText,
+            "using System.ComponentModel.DataAnnotations;",
+            "/// International phone number in E.164 format",
+            "[Required]",
+            "[RegularExpression(@\"^\\+?[1-9]\\d{1,14}$\")]",
+            "public required string PhoneNumber { get; set; }"
+        );
+    }
+
+    [Test]
+    public void ValidationApi_WithValidationDisabled_ShouldNotGenerateRegularExpressionAttribute()
+    {
+        // Arrange
+        var openApiFile = Path.Combine(TestDataDirectory, "validation-api.yaml");
+        var config = CreateDefaultConfiguration();
+        config["build_metadata.AdditionalFiles.GenerateValidationAttributes"] = "false";
+
+        // Act
+        var result = RunGenerator(openApiFile, config);
+
+        // Assert
+        AssertNoErrors(result);
+        var validationModel = GetGeneratedSource(result, "ValidationModel.g.cs");
+        var sourceText = validationModel.SourceText.ToString();
+
+        Assert.That(sourceText, Does.Not.Contain("[RegularExpression"),
+            "RegularExpression attribute should not be present when validation is disabled");
+    }
 }

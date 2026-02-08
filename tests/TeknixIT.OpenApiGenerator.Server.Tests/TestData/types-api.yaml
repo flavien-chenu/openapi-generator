@@ -1,0 +1,77 @@
+openapi: 3.0.0
+info:
+  title: Types API
+  version: 1.0.0
+paths:
+  /types:
+    get:
+      operationId: GetTypes
+      tags:
+        - Types
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TypesModel'
+components:
+  schemas:
+    TypesModel:
+      type: object
+      required:
+        - id
+        - count
+        - bigCount
+        - price
+        - temperature
+        - weight
+        - createdDate
+        - updatedAt
+        - data
+        - metadata
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier
+        count:
+          type: integer
+          description: Regular integer (int32)
+        bigCount:
+          type: integer
+          format: int64
+          description: Large integer (int64)
+        price:
+          type: number
+          description: Decimal price
+        temperature:
+          type: number
+          format: float
+          description: Float temperature
+        weight:
+          type: number
+          format: double
+          description: Double weight
+        createdDate:
+          type: string
+          format: date
+          description: Date only
+        updatedAt:
+          type: string
+          format: date-time
+          description: Date and time
+        data:
+          type: string
+          format: byte
+          description: Base64 encoded byte array
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          description: String dictionary
+        tags:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Integer dictionary

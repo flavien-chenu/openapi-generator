@@ -25,6 +25,7 @@ components:
         - email
         - age
         - username
+        - phoneNumber
       properties:
         username:
           type: string
@@ -33,6 +34,10 @@ components:
         email:
           type: string
           format: email
+        phoneNumber:
+          type: string
+          pattern: '^\+?[1-9]\d{1,14}$'
+          description: International phone number in E.164 format
         age:
           type: integer
           minimum: 18

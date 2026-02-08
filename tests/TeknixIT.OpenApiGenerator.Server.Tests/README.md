@@ -39,12 +39,33 @@ The tests are organized into specialized test classes, each focusing on a specif
   - StringLength attributes
   - Range attributes
   - Required attributes
+  - RegularExpression attributes for pattern validation
   - Validation enabled/disabled scenarios
+
+- **`TypeMappingTests.cs`**: Tests for OpenAPI type mappings to C# types
+  - Primitive type mappings (string, integer, number, boolean)
+  - Format-specific mappings (uuid → Guid, date → DateOnly, date-time → DateTime, byte → byte[])
+  - Number format mappings (float, double, decimal)
+  - Integer format mappings (int32 → int, int64 → long)
+  - Dictionary mappings (additionalProperties)
+  - Record vs class generation
+
+- **`AdvancedFeaturesTests.cs`**: Tests for advanced OpenAPI features
+  - Nullable types with oneOf
+  - Nullable properties using nullable: true
+  - Required vs optional properties
+  - Required modifier generation
 
 - **`ErrorHandlingTests.cs`**: Tests for error scenarios
   - Invalid YAML files
   - Non-existent files
   - Empty API specifications
+
+- **`JsonFormatTests.cs`**: Tests for OpenAPI specifications in JSON format
+  - JSON file parsing
+  - Contract generation from JSON
+  - Controller generation from JSON
+  - Enum generation from JSON
 
 - **`ControllerGroupingTests.cs`**: Tests for controller grouping strategies
   - ByTag grouping
@@ -55,13 +76,22 @@ The tests are organized into specialized test classes, each focusing on a specif
 ## Test Data
 
 Test data files are located in the `TestData/` directory:
+
+**YAML files:**
 - `simple-api.yaml`: Basic API with a single User resource
 - `complex-api.yaml`: Complex API with Products, multiple HTTP methods, and various parameter types
 - `enum-api.yaml`: API demonstrating enum generation
-- `validation-api.yaml`: API with validation constraints
+- `validation-api.yaml`: API with validation constraints (StringLength, Range, RegularExpression)
 - `grouping-api.yaml`: API for testing controller grouping strategies
 - `nested-api.yaml`: API with nested object schemas
 - `empty-api.yaml`: Empty API specification
+- `types-api.yaml`: API demonstrating all supported type mappings
+- `advanced-features-api.yaml`: API with advanced features (nullable types, oneOf)
+
+**JSON files:**
+- `simple-api.json`: Basic API in JSON format
+- `enum-api.json`: Enum API in JSON format
+- `nested-api.json`: Nested objects API in JSON format
 
 ## Running Tests
 

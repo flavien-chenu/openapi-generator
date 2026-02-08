@@ -77,7 +77,7 @@ Customize generation with metadata:
 | `BaseNamespace` | `Generated` | Root namespace for generated code |
 | `ContractsNamespace` | `Contracts` | Namespace for contracts (appended to BaseNamespace) |
 | `ControllersNamespace` | `Controllers` | Namespace for controllers (appended to BaseNamespace) |
-| `GenerateValidationAttributes` | `true` | Add validation attributes (Required, StringLength, etc.) |
+| `GenerateValidationAttributes` | `true` | Add validation attributes (Required, StringLength, Range, RegularExpression) from schema constraints |
 | `GenerateXmlDocumentation` | `true` | Generate XML documentation comments |
 | `UseAsyncControllers` | `true` | Generate async controller methods |
 | `AddApiControllerAttribute` | `true` | Add [ApiController] attribute to controllers |
