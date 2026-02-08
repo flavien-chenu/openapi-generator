@@ -243,11 +243,14 @@ public abstract class TestBase
             }
         }
 
-        Assert.That(beforeIndex, Is.GreaterThanOrEqualTo(0),
-            $"Line '{normalizedBefore}' not found in source");
-        Assert.That(afterIndex, Is.GreaterThan(beforeIndex),
-            $"Line '{normalizedAfter}' should appear after '{normalizedBefore}'\n" +
-            $"In source:\n{source}");
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(beforeIndex, Is.GreaterThanOrEqualTo(0),
+                    $"Line '{normalizedBefore}' not found in source");
+            Assert.That(afterIndex, Is.GreaterThan(beforeIndex),
+                $"Line '{normalizedAfter}' should appear after '{normalizedBefore}'\n" +
+                $"In source:\n{source}");
+        }
     }
 
     /// <summary>

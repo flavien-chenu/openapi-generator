@@ -1,5 +1,3 @@
-using Microsoft.CodeAnalysis;
-
 namespace TeknixIT.OpenApiGenerator.Server.Tests;
 
 /// <summary>
@@ -23,14 +21,17 @@ public class ControllerGroupingTests : TestBase
         AssertNoErrors(result);
 
         var controllers = result.GeneratedSources.Where(s => s.HintName.EndsWith("Controller.g.cs")).ToArray();
-        Assert.That(controllers.Length, Is.EqualTo(3), "Should have 3 controllers when grouping by tag");
+        Assert.That(controllers, Has.Length.EqualTo(3), "Should have 3 controllers when grouping by tag");
 
-        Assert.That(controllers.Any(s => s.HintName == "UsersController.g.cs"), Is.True,
-            "UsersController should exist");
-        Assert.That(controllers.Any(s => s.HintName == "ProductsController.g.cs"), Is.True,
-            "ProductsController should exist");
-        Assert.That(controllers.Any(s => s.HintName == "OrdersController.g.cs"), Is.True,
-            "OrdersController should exist");
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(controllers.Any(s => s.HintName == "UsersController.g.cs"), Is.True,
+                "UsersController should exist");
+            Assert.That(controllers.Any(s => s.HintName == "ProductsController.g.cs"), Is.True,
+                "ProductsController should exist");
+            Assert.That(controllers.Any(s => s.HintName == "OrdersController.g.cs"), Is.True,
+                "OrdersController should exist");
+        }
 
         var usersController = controllers.First(s => s.HintName == "UsersController.g.cs");
         var usersSource = usersController.SourceText.ToString();
@@ -53,15 +54,18 @@ public class ControllerGroupingTests : TestBase
         AssertNoErrors(result);
 
         var controllers = result.GeneratedSources.Where(s => s.HintName.EndsWith("Controller.g.cs")).ToArray();
-        Assert.That(controllers.Length, Is.EqualTo(3),
+        Assert.That(controllers, Has.Length.EqualTo(3),
             "Should have 3 controllers when grouping by first path segment");
 
-        Assert.That(controllers.Any(s => s.HintName == "UsersController.g.cs"), Is.True,
-            "UsersController should exist");
-        Assert.That(controllers.Any(s => s.HintName == "ProductsController.g.cs"), Is.True,
-            "ProductsController should exist");
-        Assert.That(controllers.Any(s => s.HintName == "OrdersController.g.cs"), Is.True,
-            "OrdersController should exist");
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(controllers.Any(s => s.HintName == "UsersController.g.cs"), Is.True,
+                "UsersController should exist");
+            Assert.That(controllers.Any(s => s.HintName == "ProductsController.g.cs"), Is.True,
+                "ProductsController should exist");
+            Assert.That(controllers.Any(s => s.HintName == "OrdersController.g.cs"), Is.True,
+                "OrdersController should exist");
+        }
 
         var ordersController = controllers.First(s => s.HintName == "OrdersController.g.cs");
         var ordersSource = ordersController.SourceText.ToString();
@@ -84,16 +88,19 @@ public class ControllerGroupingTests : TestBase
         AssertNoErrors(result);
 
         var controllers = result.GeneratedSources.Where(s => s.HintName.EndsWith("Controller.g.cs")).ToArray();
-        Assert.That(controllers.Length, Is.EqualTo(4), "Should have 4 controllers when grouping by path");
+        Assert.That(controllers, Has.Length.EqualTo(4), "Should have 4 controllers when grouping by path");
 
-        Assert.That(controllers.Any(s => s.HintName == "UsersController.g.cs"), Is.True,
-            "UsersController should exist");
-        Assert.That(controllers.Any(s => s.HintName == "ProductsController.g.cs"), Is.True,
-            "ProductsController should exist");
-        Assert.That(controllers.Any(s => s.HintName == "OrdersPendingController.g.cs"), Is.True,
-            "OrdersPendingController should exist");
-        Assert.That(controllers.Any(s => s.HintName == "OrdersCompletedController.g.cs"), Is.True,
-            "OrdersCompletedController should exist");
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(controllers.Any(s => s.HintName == "UsersController.g.cs"), Is.True,
+                "UsersController should exist");
+            Assert.That(controllers.Any(s => s.HintName == "ProductsController.g.cs"), Is.True,
+                "ProductsController should exist");
+            Assert.That(controllers.Any(s => s.HintName == "OrdersPendingController.g.cs"), Is.True,
+                "OrdersPendingController should exist");
+            Assert.That(controllers.Any(s => s.HintName == "OrdersCompletedController.g.cs"), Is.True,
+                "OrdersCompletedController should exist");
+        }
 
         var usersController = controllers.First(s => s.HintName == "UsersController.g.cs");
         var usersSource = usersController.SourceText.ToString();
@@ -116,6 +123,6 @@ public class ControllerGroupingTests : TestBase
         AssertNoErrors(result);
 
         var controllers = result.GeneratedSources.Where(s => s.HintName.EndsWith("Controller.g.cs")).ToArray();
-        Assert.That(controllers.Length, Is.EqualTo(3), "Default grouping strategy should be ByTag");
+        Assert.That(controllers, Has.Length.EqualTo(3), "Default grouping strategy should be ByTag");
     }
 }

@@ -63,7 +63,7 @@ public class ErrorHandlingTests : TestBase
 
         // Assert
         AssertNoErrors(result, "No errors should be generated even for an empty API");
-        Assert.That(result.GeneratedSources.Length, Is.EqualTo(0),
+        Assert.That(result.GeneratedSources, Is.Empty,
             "No files should be generated for an empty API");
     }
 }

@@ -1,5 +1,3 @@
-using Microsoft.CodeAnalysis;
-
 namespace TeknixIT.OpenApiGenerator.Server.Tests;
 
 /// <summary>
@@ -52,10 +50,13 @@ public class ConfigurationTests : TestBase
         // Assert
         AssertNoErrors(result);
 
-        Assert.That(result.GeneratedSources.Any(s => s.HintName == "User.g.cs"), Is.True,
-            "Contracts should be generated");
-        Assert.That(result.GeneratedSources.Any(s => s.HintName.EndsWith("Controller.g.cs")), Is.False,
-            "Controllers should not be generated");
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.GeneratedSources.Any(s => s.HintName == "User.g.cs"), Is.True,
+                    "Contracts should be generated");
+            Assert.That(result.GeneratedSources.Any(s => s.HintName.EndsWith("Controller.g.cs")), Is.False,
+                "Controllers should not be generated");
+        }
     }
 
     [Test]
@@ -125,7 +126,7 @@ public class ConfigurationTests : TestBase
         AssertNoErrors(result);
         var controller = GetGeneratedSource(result, "UsersController.g.cs");
         var sourceText = controller.SourceText.ToString();
-        Assert.That(sourceText.Trim().Replace(" ", "").Contains("[ApiController]"), Is.False,
+        Assert.That(sourceText.Trim().Replace(" ", ""), Does.Not.Contain("[ApiController]"),
             "[ApiController] attribute should not be present");
     }
 

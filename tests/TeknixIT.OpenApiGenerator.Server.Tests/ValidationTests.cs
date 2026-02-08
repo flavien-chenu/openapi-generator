@@ -51,9 +51,12 @@ public class ValidationTests : TestBase
         var validationModel = GetGeneratedSource(result, "ValidationModel.g.cs");
         var sourceText = validationModel.SourceText.ToString();
 
-        Assert.That(sourceText.Trim().Replace(" ", "").Contains("[MinLength"), Is.False,
-            "MinLength attribute should not be present");
-        Assert.That(sourceText.Trim().Replace(" ", "").Contains("[MaxLength"), Is.False,
-            "MaxLength attribute should not be present");
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(sourceText.Trim().Replace(" ", ""), Does.Not.Contain("[MinLength"),
+                    "MinLength attribute should not be present");
+            Assert.That(sourceText.Trim().Replace(" ", ""), Does.Not.Contain("[MaxLength"),
+                "MaxLength attribute should not be present");
+        }
     }
 }
