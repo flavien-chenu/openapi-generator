@@ -190,13 +190,13 @@ internal sealed class ControllerGenerator
     {
         // Remove leading/trailing slashes and replace path separators with underscores
         var cleanPath = pathKey.Trim('/');
-        
+
         // Remove path parameters (e.g., {id}) and replace remaining slashes
         var segments = cleanPath.Split(['/'], StringSplitOptions.RemoveEmptyEntries);
         var sanitizedSegments = segments
             .Where(s => !s.StartsWith("{") || !s.EndsWith("}"))
             .Select(s => SanitizeName(s, pascalCase: true));
-        
+
         var name = string.Join("", sanitizedSegments);
         return !string.IsNullOrWhiteSpace(name) ? name : "Default";
     }
@@ -254,7 +254,7 @@ internal sealed class ControllerGenerator
         var route = controller.Route.Length > 0
             ? path.Replace(controller.Route, string.Empty)
             : path;
-        
+
         if (controller.Route.Length > 0)
         {
             route = ConvertPathToRouteTemplate(route);
