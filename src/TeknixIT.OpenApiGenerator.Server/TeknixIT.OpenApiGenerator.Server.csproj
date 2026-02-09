@@ -54,7 +54,6 @@
         <None Include="build\TeknixIT.OpenApiGenerator.Server.targets" PackagePath="build" Pack="true"/>
         <None Include="build\TeknixIT.OpenApiGenerator.Server.xml" PackagePath="build" Pack="true"/>
         <None Include="README.md" Pack="true" PackagePath="/"/>
-        <None Include="LICENSE" Pack="true" PackagePath="/"/>
         <None Label="icon.png" Include="../../docs/icon.png" Pack="true" Visible="false" PackagePath="/"/>
     </ItemGroup>
 
