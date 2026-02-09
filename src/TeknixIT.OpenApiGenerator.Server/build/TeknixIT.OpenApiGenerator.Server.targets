@@ -12,10 +12,8 @@
     <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="AddApiControllerAttribute" />
     <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="ControllerBaseClass" />
     <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="ControllerGroupingStrategy" />
-
   </ItemGroup>
-
-  <Target Name="_InjectTeknixITOpenApiItems" BeforeTargets="GenerateMSIL;GenerateCSharpWithAnalyzers">
+  <Target Name="_InjectTeknixITOpenApiGeneratorServerItems" BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun">
     <ItemGroup>
       <AdditionalFiles Include="@(OpenApiGeneratorServer)"
                        SourceItemType="OpenApiGeneratorServer"
@@ -32,5 +30,4 @@
                        ControllerGroupingStrategy="%(OpenApiGeneratorServer.ControllerGroupingStrategy)" />
     </ItemGroup>
   </Target>
-
 </Project>

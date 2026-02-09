@@ -4,7 +4,7 @@
       <GenerateContracts>true</GenerateContracts>
       <GenerateControllers>true</GenerateControllers>
       <UseRecords>true</UseRecords>
-      <BaseNamespace>Generated</BaseNamespace>
+      <BaseNamespace>$(RootNamespace).Generated</BaseNamespace>
       <ContractsNamespace>Contracts</ContractsNamespace>
       <ControllersNamespace>Controllers</ControllersNamespace>
       <GenerateValidationAttributes>true</GenerateValidationAttributes>
@@ -15,7 +15,6 @@
       <ControllerGroupingStrategy>ByTag</ControllerGroupingStrategy>
     </OpenApiGeneratorServer>
   </ItemDefinitionGroup>
-
   <ItemGroup>
     <PropertyPageSchema Include="$(MSBuildThisFileDirectory)TeknixIT.OpenApiGenerator.Server.xml" />
   </ItemGroup>
