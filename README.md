@@ -1,5 +1,7 @@
 # OpenAPI Generator
 
+[![CI/CD Pipeline](https://github.com/flavien-chenu/openapi-generator/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/flavien-chenu/openapi-generator/actions/workflows/ci-cd.yml)
+
 Source generators for OpenAPI specifications in .NET projects.
 
 ## Overview
