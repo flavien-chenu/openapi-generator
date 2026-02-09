@@ -19,6 +19,7 @@
         <DevelopmentDependency>true</DevelopmentDependency>
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <PackageIcon>icon.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
