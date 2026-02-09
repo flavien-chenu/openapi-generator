@@ -9,7 +9,6 @@
 
         <!-- NuGet Package configuration -->
         <PackageId>TeknixIT.OpenApiGenerator.Server</PackageId>
-        <Version>1.0.0</Version>
         <Authors>Flavien Chenu</Authors>
         <Description>Source generator for OpenAPI - Generates contracts and controllers from OpenAPI schemas. Supports .NET 8, 9, 10+. Highly configurable with records/classes, validation attributes, and more.</Description>
         <PackageTags>openapi;source-generator;dto;controller;aspnetcore;api;codegen;openapi3;contract-first</PackageTags>
@@ -19,6 +18,7 @@
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <DevelopmentDependency>true</DevelopmentDependency>
         <NoPackageAnalysis>true</NoPackageAnalysis>
+        <PackageIcon>icon.png</PackageIcon>
     </PropertyGroup>
 
     <ItemGroup>
@@ -53,7 +53,9 @@
         <None Include="build\TeknixIT.OpenApiGenerator.Server.props" PackagePath="build" Pack="true"/>
         <None Include="build\TeknixIT.OpenApiGenerator.Server.targets" PackagePath="build" Pack="true"/>
         <None Include="build\TeknixIT.OpenApiGenerator.Server.xml" PackagePath="build" Pack="true"/>
-        <None Include="README.md" Pack="true" PackagePath="\"/>
+        <None Include="README.md" Pack="true" PackagePath="/"/>
+        <None Include="LICENSE" Pack="true" PackagePath="/"/>
+        <None Label="icon.png" Include="../../docs/icon.png" Pack="true" Visible="false" PackagePath="/"/>
     </ItemGroup>
 
     <!-- Analyzer release tracking -->
