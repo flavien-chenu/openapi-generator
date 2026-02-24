@@ -39,6 +39,7 @@ components:
         - street
         - city
         - country
+        - zipCode
       properties:
         street:
           type: string
@@ -53,6 +54,7 @@ components:
       required:
         - firstName
         - lastName
+        - position
       properties:
         firstName:
           type: string

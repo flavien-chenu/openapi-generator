@@ -77,20 +77,12 @@ internal sealed class ControllerGenerator
         var dtosNamespace = string.IsNullOrWhiteSpace(_configuration.BaseNamespace)
             ? _configuration.ContractsNamespace
             : $"{_configuration.BaseNamespace}.{_configuration.ContractsNamespace}";
-        var controllerBaseNamespaceComponents = _configuration.ControllerBaseClass.Split('.');
-        var controllerBaseNamespace = string.Join(".", controllerBaseNamespaceComponents.Take(controllerBaseNamespaceComponents.Length - 1));
 
         sb.AppendLine("using System;");
         sb.AppendLine("using System.Collections.Generic;");
         sb.AppendLine("using System.Threading.Tasks;");
         sb.AppendLine("using Microsoft.AspNetCore.Mvc;");
         sb.AppendLine($"using {dtosNamespace};");
-
-        if (!string.IsNullOrWhiteSpace(controllerBaseNamespace) && controllerBaseNamespace != _configuration.ControllersNamespace)
-        {
-            sb.AppendLine($"using {controllerBaseNamespace};");
-        }
-
         sb.AppendLine();
     }
 
@@ -211,7 +203,8 @@ internal sealed class ControllerGenerator
     {
         var definition = new ControllerDefinition(controllerName)
         {
-            Route = GetCommonPathPrefix([.. paths.Select(p => p.Path)]), Documentation = $"Controller for {controllerName}",
+            Route = GetCommonPathPrefix([.. paths.Select(p => p.Path)]),
+            Documentation = $"Controller for {controllerName}",
         };
 
         definition.Methods = GetMethodsDefinition(definition, paths, document);
@@ -297,7 +290,7 @@ internal sealed class ControllerGenerator
                 Type = GetParameterType(param),
                 Documentation = param.Description ?? string.Empty,
                 Source = MapParameterLocation(param.In),
-                IsRequired = param.Required || param.In is ParameterLocation.Path,
+                IsRequired = param.Required,
                 DefaultValue = param.Schema?.Default?.ToString()
             });
             i++;
@@ -386,7 +379,7 @@ internal sealed class ControllerGenerator
     /// </summary>
     private void AppendControllerDeclaration(StringBuilder sb, ControllerDefinition definition)
     {
-        sb.AppendLine($"public abstract class {definition.Name}ControllerBase : {_configuration.ControllerBaseClass.Split('.').Last()}");
+        sb.AppendLine($"public abstract class {definition.Name}ControllerBase : {_configuration.ControllerBaseClass}");
         sb.AppendLine("{");
     }
 
@@ -537,16 +530,15 @@ internal sealed class ControllerGenerator
 
     /// <summary>
     /// Sorts parameters according to C# method signature conventions:
-    /// 1. Required non-nullable parameters
-    /// 2. Required nullable parameters
-    /// 3. Optional parameters (with default values)
+    /// 1. Required parameters (IsRequired = true)
+    /// 2. Optional parameters (IsRequired = false or nullable types)
+    /// 3. Parameters with default values (always last)
     /// Within each group, sorted by source: FromRoute, FromQuery, FromHeader, FromBody.
     /// </summary>
     private static List<ControllerParameterDefinition> SortParametersByRequirement(List<ControllerParameterDefinition> parameters)
     {
         return parameters
-            .OrderBy(p => p.DefaultValue != null ? 1 : 0) // Parameters with default values last (optional)
-            .ThenBy(p => IsNullableType(p.Type) ? 1 : 0) // Non-nullable before nullable (within required group)
+            .OrderBy(p => p.DefaultValue != null ? 2 : (p.IsRequired ? 0 : 1)) // Parameters with defaults last, then required, then optional
             .ThenBy(GetParameterSortOrder) // Then by source (Path, Query, Header, Body)
             .ToList();
     }
@@ -659,7 +651,12 @@ internal sealed class ControllerGenerator
     /// </summary>
     private static string GetParameterType(IOpenApiParameter parameter)
     {
-        return parameter.Schema == null ? "string" : TypeUtils.DetermineFinalType(parameter.Schema);
+        var type = parameter.Schema == null ? "string" : TypeUtils.DetermineFinalType(parameter.Schema);
+        if (parameter is { Required: false, Schema.Default: null } && !type.EndsWith("?"))
+        {
+            type += "?";
+        }
+        return type;
     }
 
     /// <summary>

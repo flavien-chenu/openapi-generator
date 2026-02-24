@@ -67,9 +67,9 @@ public class TypeMappingTests : TestBase
         Assert.That(sourceText, Does.Contain("public required IDictionary<string, string> Metadata { get; set; }"),
             "Object with additionalProperties of type string should map to IDictionary<string, string>");
 
-        // Dictionary with integer values
-        Assert.That(sourceText, Does.Contain("public required IDictionary<string, int> Tags { get; set; }"),
-            "Object with additionalProperties of type integer should map to IDictionary<string, int>");
+        // Dictionary with integer values (not required, so nullable)
+        Assert.That(sourceText, Does.Contain("public IDictionary<string, int>? Tags { get; set; }"),
+            "Object with additionalProperties of type integer should map to IDictionary<string, int>? when not required");
     }
 
     [Test]

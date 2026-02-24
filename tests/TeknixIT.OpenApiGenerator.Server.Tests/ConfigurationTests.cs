@@ -144,6 +144,6 @@ public class ConfigurationTests : TestBase
         // Assert
         AssertNoErrors(result);
         var controller = GetGeneratedSource(result, "UsersController.g.cs");
-        AssertContainsLine(controller.SourceText.ToString(), ": BaseApiController");
+        AssertContainsLine(controller.SourceText.ToString(), ": MyApp.Controllers.BaseApiController");
     }
 }

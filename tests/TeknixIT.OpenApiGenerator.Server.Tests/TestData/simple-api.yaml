@@ -28,6 +28,7 @@ components:
       required:
         - id
         - name
+        - email
       properties:
         id:
           type: string

@@ -82,19 +82,15 @@ public class ContractGenerationTests : TestBase
                                            [Required]
                                            [StringLength(100, MinimumLength = 1)]
                                            public required string Name { get; set; }
-                                           [Required]
-                                           public required string Description { get; set; }
+                                           public string? Description { get; set; }
                                            [Required]
                                            [Range(0, double.MaxValue)]
                                            public required double Price { get; set; }
-                                           [Required]
-                                           public required string Category { get; set; }
+                                           public string? Category { get; set; }
                                            [Required]
                                            public required ProductStatus Status { get; set; }
-                                           [Required]
-                                           public required ICollection<string> Tags { get; set; }
-                                           [Required]
-                                           public required DateTime CreatedAt { get; set; }
+                                           public ICollection<string>? Tags { get; set; }
+                                           public DateTime? CreatedAt { get; set; }
                                        }
 
                                        """;
@@ -117,15 +113,12 @@ public class ContractGenerationTests : TestBase
                                                         [Required]
                                                         [StringLength(100, MinimumLength = 1)]
                                                         public required string Name { get; set; }
-                                                        [Required]
-                                                        public required string Description { get; set; }
+                                                        public string? Description { get; set; }
                                                         [Required]
                                                         [Range(0, double.MaxValue)]
                                                         public required double Price { get; set; }
-                                                        [Required]
-                                                        public required string Category { get; set; }
-                                                        [Required]
-                                                        public required ICollection<string> Tags { get; set; }
+                                                        public string? Category { get; set; }
+                                                        public ICollection<string>? Tags { get; set; }
                                                     }
 
                                                     """;
@@ -145,20 +138,14 @@ public class ContractGenerationTests : TestBase
 
                                                     public record UpdateProductRequest
                                                     {
-                                                        [Required]
                                                         [StringLength(100, MinimumLength = 1)]
-                                                        public required string Name { get; set; }
-                                                        [Required]
-                                                        public required string Description { get; set; }
-                                                        [Required]
+                                                        public string? Name { get; set; }
+                                                        public string? Description { get; set; }
                                                         [Range(0, double.MaxValue)]
-                                                        public required double Price { get; set; }
-                                                        [Required]
-                                                        public required string Category { get; set; }
-                                                        [Required]
-                                                        public required ProductStatus Status { get; set; }
-                                                        [Required]
-                                                        public required ICollection<string> Tags { get; set; }
+                                                        public double? Price { get; set; }
+                                                        public string? Category { get; set; }
+                                                        public ProductStatus? Status { get; set; }
+                                                        public ICollection<string>? Tags { get; set; }
                                                     }
 
                                                     """;
@@ -395,8 +382,7 @@ public class ContractGenerationTests : TestBase
                                            public required string Name { get; set; }
                                            [Required]
                                            public required Address Address { get; set; }
-                                           [Required]
-                                           public required ICollection<Employee> Employees { get; set; }
+                                           public ICollection<Employee>? Employees { get; set; }
                                        }
 
                                        """;
@@ -449,8 +435,7 @@ public class ContractGenerationTests : TestBase
                                             public required string LastName { get; set; }
                                             [Required]
                                             public required string Position { get; set; }
-                                            [Required]
-                                            public required double Salary { get; set; }
+                                            public double? Salary { get; set; }
                                         }
 
                                         """;
@@ -488,8 +473,7 @@ public class ContractGenerationTests : TestBase
                                            public required string Name { get; set; }
                                            [Required]
                                            public required Address Address { get; set; }
-                                           [Required]
-                                           public required ICollection<Employee> Employees { get; set; }
+                                           public ICollection<Employee>? Employees { get; set; }
                                        }
 
                                        """;
@@ -528,19 +512,15 @@ public class ContractGenerationTests : TestBase
                                            [Required]
                                            [StringLength(100, MinimumLength = 1)]
                                            public required string Name { get; set; }
-                                           [Required]
-                                           public required string Description { get; set; }
+                                           public string? Description { get; set; }
                                            [Required]
                                            [Range(0, double.MaxValue)]
                                            public required double Price { get; set; }
-                                           [Required]
-                                           public required string Category { get; set; }
+                                           public string? Category { get; set; }
                                            [Required]
                                            public required ProductStatus Status { get; set; }
-                                           [Required]
-                                           public required ICollection<string> Tags { get; set; }
-                                           [Required]
-                                           public required DateTime CreatedAt { get; set; }
+                                           public ICollection<string>? Tags { get; set; }
+                                           public DateTime? CreatedAt { get; set; }
                                        }
 
                                        """;
@@ -579,19 +559,15 @@ public class ContractGenerationTests : TestBase
                                            [Required]
                                            [StringLength(100, MinimumLength = 1)]
                                            public required string Name { get; set; }
-                                           [Required]
-                                           public required string Description { get; set; }
+                                           public string? Description { get; set; }
                                            [Required]
                                            [Range(0, double.MaxValue)]
                                            public required double Price { get; set; }
-                                           [Required]
-                                           public required string Category { get; set; }
+                                           public string? Category { get; set; }
                                            [Required]
                                            public required ProductStatus Status { get; set; }
-                                           [Required]
-                                           public required ICollection<string> Tags { get; set; }
-                                           [Required]
-                                           public required DateTime CreatedAt { get; set; }
+                                           public ICollection<string>? Tags { get; set; }
+                                           public DateTime? CreatedAt { get; set; }
                                        }
 
                                        """;

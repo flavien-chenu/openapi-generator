@@ -189,7 +189,7 @@ internal sealed class ContractGenerator
 
         foreach (var property in schema.Properties)
         {
-            var isRequired = (schema.Required?.Contains(property.Key) ?? false) || !TypeUtils.IsNullableType(property.Value);
+            var isRequired = schema.Required?.Contains(property.Key) ?? false;
             GenerateProperty(sb, property.Key, property.Value, isRequired);
         }
     }
@@ -294,6 +294,13 @@ internal sealed class ContractGenerator
     private static void AppendPropertyDeclaration(StringBuilder sb, string propertyName, IOpenApiSchema propertySchema, bool isRequired)
     {
         var csharpType = TypeUtils.DetermineFinalType(propertySchema);
+
+        // If the property is not required and not already nullable, make it nullable
+        if (!isRequired && !TypeUtils.IsNullableType(propertySchema) && !csharpType.EndsWith("?"))
+        {
+            csharpType += "?";
+        }
+
         var sanitizedName = SanitizeName(propertyName, pascalCase: true);
         var requiredModifier = isRequired ? "required " : string.Empty;
 

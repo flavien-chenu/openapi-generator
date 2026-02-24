@@ -132,7 +132,7 @@ public class JsonFormatTests : TestBase
         // Verify Category contract with self-reference
         var categoryText = categoryContract.SourceText.ToString();
         Assert.That(categoryText, Does.Contain("public record Category"));
-        Assert.That(categoryText, Does.Contain("public required Category Parent { get; set; }"));
+        Assert.That(categoryText, Does.Contain("public Category? Parent { get; set; }"));
     }
 
     [Test]

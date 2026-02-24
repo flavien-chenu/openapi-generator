@@ -1,0 +1,61 @@
+openapi: 3.0.0
+info:
+  title: Parameter Requirements API
+  version: 1.0.0
+paths:
+  /test/{requiredPath}:
+    get:
+      operationId: TestRequirements
+      tags:
+        - Test
+      parameters:
+        # Path parameter - should be required by default
+        - name: requiredPath
+          in: path
+          required: true
+          schema:
+            type: string
+        # Query parameter with explicit required: true
+        - name: requiredQuery
+          in: query
+          required: true
+          schema:
+            type: string
+        # Query parameter without required (should default to false)
+        - name: optionalQuery
+          in: query
+          schema:
+            type: string
+        # Query parameter with explicit required: false
+        - name: explicitOptionalQuery
+          in: query
+          required: false
+          schema:
+            type: integer
+        # Header parameter without required (should default to false)
+        - name: optionalHeader
+          in: header
+          schema:
+            type: string
+        # Header parameter with explicit required: true
+        - name: requiredHeader
+          in: header
+          required: true
+          schema:
+            type: string
+        # Query parameter with default value (should be last)
+        - name: queryWithDefault
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
