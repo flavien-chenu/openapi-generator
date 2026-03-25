@@ -30,7 +30,7 @@ public class JsonFormatTests : TestBase
 
                                             namespace TestApp.Contracts;
 
-                                            public record User
+                                            public record User()
                                             {
                                                 [Required]
                                                 public required string Id { get; set; }
@@ -103,7 +103,7 @@ public class JsonFormatTests : TestBase
         var orderContract = GetGeneratedSource(result, "Order.g.cs");
 
         var orderText = orderContract.SourceText.ToString();
-        Assert.That(orderText, Does.Contain("public record Order"));
+        Assert.That(orderText, Does.Contain("public record Order()"));
         Assert.That(orderText, Does.Contain("public required string Id { get; set; }"));
         Assert.That(orderText, Does.Contain("public required OrderStatus Status { get; set; }"));
     }
@@ -126,12 +126,12 @@ public class JsonFormatTests : TestBase
 
         // Verify Product contract
         var productText = productContract.SourceText.ToString();
-        Assert.That(productText, Does.Contain("public record Product"));
+        Assert.That(productText, Does.Contain("public record Product()"));
         Assert.That(productText, Does.Contain("public required Category Category { get; set; }"));
 
         // Verify Category contract with self-reference
         var categoryText = categoryContract.SourceText.ToString();
-        Assert.That(categoryText, Does.Contain("public record Category"));
+        Assert.That(categoryText, Does.Contain("public record Category()"));
         Assert.That(categoryText, Does.Contain("public Category? Parent { get; set; }"));
     }
 

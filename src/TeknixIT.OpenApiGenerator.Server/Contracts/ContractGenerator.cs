@@ -173,7 +173,7 @@ internal sealed class ContractGenerator
     private void AppendSchemaDeclaration(StringBuilder sb, string schemaName)
     {
         var keyword = _configuration.UseRecords ? "record" : "class";
-        sb.AppendLine($"public {keyword} {SanitizeName(schemaName)}");
+        sb.AppendLine($"public {keyword} {SanitizeName(schemaName)}()");
         sb.AppendLine("{");
     }
 

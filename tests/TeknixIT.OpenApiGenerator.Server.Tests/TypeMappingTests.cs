@@ -24,7 +24,7 @@ public class TypeMappingTests : TestBase
         // Verify all type mappings
         AssertContainsLinesInOrder(sourceText,
             "namespace TestApp.Contracts;",
-            "public record TypesModel"
+            "public record TypesModel()"
         );
 
         // UUID -> Guid

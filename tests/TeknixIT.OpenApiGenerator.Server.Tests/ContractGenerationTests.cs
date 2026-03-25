@@ -30,7 +30,7 @@ public class ContractGenerationTests : TestBase
 
                                             namespace TestApp.Contracts;
 
-                                            public record User
+                                            public record User()
                                             {
                                                 [Required]
                                                 public required string Id { get; set; }
@@ -75,7 +75,7 @@ public class ContractGenerationTests : TestBase
 
                                        namespace TestApp.Contracts;
 
-                                       public record Product
+                                       public record Product()
                                        {
                                            [Required]
                                            public required long Id { get; set; }
@@ -108,7 +108,7 @@ public class ContractGenerationTests : TestBase
 
                                                     namespace TestApp.Contracts;
 
-                                                    public record CreateProductRequest
+                                                    public record CreateProductRequest()
                                                     {
                                                         [Required]
                                                         [StringLength(100, MinimumLength = 1)]
@@ -136,7 +136,7 @@ public class ContractGenerationTests : TestBase
 
                                                     namespace TestApp.Contracts;
 
-                                                    public record UpdateProductRequest
+                                                    public record UpdateProductRequest()
                                                     {
                                                         [StringLength(100, MinimumLength = 1)]
                                                         public string? Name { get; set; }
@@ -376,7 +376,7 @@ public class ContractGenerationTests : TestBase
 
                                        namespace TestApp.Contracts;
 
-                                       public record Company
+                                       public record Company()
                                        {
                                            [Required]
                                            public required string Name { get; set; }
@@ -400,7 +400,7 @@ public class ContractGenerationTests : TestBase
 
                                        namespace TestApp.Contracts;
 
-                                       public record Address
+                                       public record Address()
                                        {
                                            [Required]
                                            public required string Street { get; set; }
@@ -427,7 +427,7 @@ public class ContractGenerationTests : TestBase
 
                                         namespace TestApp.Contracts;
 
-                                        public record Employee
+                                        public record Employee()
                                         {
                                             [Required]
                                             public required string FirstName { get; set; }
@@ -467,7 +467,7 @@ public class ContractGenerationTests : TestBase
 
                                        namespace TestApp.Contracts;
 
-                                       public record Company
+                                       public record Company()
                                        {
                                            [Required]
                                            public required string Name { get; set; }
@@ -505,7 +505,7 @@ public class ContractGenerationTests : TestBase
 
                                        namespace TestApp.Contracts;
 
-                                       public record Product
+                                       public record Product()
                                        {
                                            [Required]
                                            public required long Id { get; set; }
@@ -552,7 +552,7 @@ public class ContractGenerationTests : TestBase
 
                                        namespace TestApp.Contracts;
 
-                                       public record Product
+                                       public record Product()
                                        {
                                            [Required]
                                            public required long Id { get; set; }

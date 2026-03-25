@@ -25,7 +25,7 @@ public class ValidationTests : TestBase
         AssertContainsLinesInOrder(sourceText,
             "using System.ComponentModel.DataAnnotations;",
             "namespace TestApp.Contracts;",
-            "public record ValidationModel",
+            "public record ValidationModel()",
             "[StringLength(20, MinimumLength = 3)]",
             "public required string Username",
             "[Range(18, 120)]",
