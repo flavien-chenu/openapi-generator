@@ -66,4 +66,9 @@ public class GeneratorConfiguration
     /// Strategy for grouping operations into controllers.
     /// </summary>
     public ControllerGroupingStrategy ControllerGroupingStrategy { get; set; } = ControllerGroupingStrategy.ByTag;
+
+    /// <summary>
+    /// Directory where generated .cs files will be written.
+    /// </summary>
+    public string OutputDirectory { get; set; } = string.Empty;
 }

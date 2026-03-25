@@ -1,10 +1,9 @@
-using System.Collections.Immutable;
 using System.Reflection;
 using System.Text;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Text;
+using Microsoft.OpenApi;
+using Microsoft.OpenApi.Reader;
+using TeknixIT.OpenApiGenerator.Server.Contracts;
+using TeknixIT.OpenApiGenerator.Server.Controllers;
 
 namespace TeknixIT.OpenApiGenerator.Server.Tests;
 
@@ -37,66 +36,110 @@ public abstract class TestBase
     {
         return new Dictionary<string, string>
         {
-            ["build_metadata.AdditionalFiles.SourceItemType"] = "OpenApiGeneratorServer",
-            ["build_metadata.AdditionalFiles.GenerateControllers"] = "true",
-            ["build_metadata.AdditionalFiles.BaseNamespace"] = "TestApp",
-            ["build_metadata.AdditionalFiles.ContractsNamespace"] = "Contracts",
-            ["build_metadata.AdditionalFiles.ControllersNamespace"] = "Controllers",
-            ["build_metadata.AdditionalFiles.UseAsyncControllers"] = "true",
-            ["build_metadata.AdditionalFiles.GenerateValidationAttributes"] = "true",
-            ["build_metadata.AdditionalFiles.AddApiControllerAttribute"] = "true",
-            ["build_metadata.AdditionalFiles.ControllerBaseClass"] = "ControllerBase",
-            ["build_metadata.AdditionalFiles.UseRecords"] = "true",
-            ["build_metadata.AdditionalFiles.GenerateXmlDocumentation"] = "true"
+            ["GenerateControllers"] = "true",
+            ["BaseNamespace"] = "TestApp",
+            ["ContractsNamespace"] = "Contracts",
+            ["ControllersNamespace"] = "Controllers",
+            ["UseAsyncControllers"] = "true",
+            ["GenerateValidationAttributes"] = "true",
+            ["AddApiControllerAttribute"] = "true",
+            ["ControllerBaseClass"] = "ControllerBase",
+            ["UseRecords"] = "true",
+            ["GenerateXmlDocumentation"] = "true"
         };
     }
 
     protected static GeneratorRunResult RunGenerator(string openApiFile, Dictionary<string, string> config)
     {
-        var compilation = CreateCompilation();
+        var outputDir = Path.Combine(Path.GetTempPath(), "openapi-gen-tests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(outputDir);
 
-        var additionalFiles = ImmutableArray.Create<AdditionalText>(
-            new TestAdditionalText(openApiFile));
+        try
+        {
+            var configuration = new GeneratorConfiguration
+            {
+                OpenApiFile = openApiFile,
+                OutputDirectory = outputDir,
+                GenerateControllers = GetBool(config, "GenerateControllers", true),
+                UseRecords = GetBool(config, "UseRecords", true),
+                GenerateValidationAttributes = GetBool(config, "GenerateValidationAttributes", true),
+                GenerateXmlDocumentation = GetBool(config, "GenerateXmlDocumentation", true),
+                UseAsyncControllers = GetBool(config, "UseAsyncControllers", true),
+                AddApiControllerAttribute = GetBool(config, "AddApiControllerAttribute", true),
+                BaseNamespace = GetString(config, "BaseNamespace", Constants.Defaults.BaseNamespace),
+                ContractsNamespace = GetString(config, "ContractsNamespace", Constants.Defaults.ContractsNamespace),
+                ControllersNamespace = GetString(config, "ControllersNamespace", Constants.Defaults.ControllersNamespace),
+                ControllerBaseClass = GetString(config, "ControllerBaseClass", Constants.Defaults.ControllerBaseClass),
+                ControllerGroupingStrategy = GetEnum(config, "ControllerGroupingStrategy", ControllerGroupingStrategy.ByTag),
+            };
 
-        var optionsProvider = new TestAnalyzerConfigOptionsProvider(openApiFile, config);
+            var settings = new OpenApiReaderSettings();
+            settings.AddYamlReader();
+            settings.AddJsonReader();
 
-        var generator = new OpenApiSourceGenerator();
+            var (document, diagnostic) = OpenApiDocument.LoadAsync(openApiFile, settings)
+                .GetAwaiter()
+                .GetResult();
 
-        GeneratorDriver driver = CSharpGeneratorDriver.Create(
-            generators: [generator.AsSourceGenerator()],
-            additionalTexts: additionalFiles,
-            optionsProvider: optionsProvider);
+            if (document == null || (diagnostic != null && diagnostic.Errors.Any()))
+            {
+                return new GeneratorRunResult
+                {
+                    Errors = [$"TEKX0002: Unable to parse OpenAPI document: {openApiFile}"]
+                };
+            }
 
-        driver = driver.RunGeneratorsAndUpdateCompilation(
-            compilation,
-            out Compilation _,
-            out var diagnostics);
+            var generatedFiles = new List<GeneratedFile>();
 
-        var runResult = driver.GetRunResult();
-        var generatorResult = runResult.Results[0];
+            if (document.Components?.Schemas != null)
+            {
+                var contractGenerator = new ContractGenerator(configuration);
+                foreach (var file in contractGenerator.Generate(document))
+                {
+                    generatedFiles.Add(new GeneratedFile(Path.GetFileName(file), File.ReadAllText(file)));
+                }
+            }
 
-        return new GeneratorRunResult { GeneratedSources = generatorResult.GeneratedSources, Diagnostics = diagnostics, Exception = generatorResult.Exception };
+            if (configuration.GenerateControllers)
+            {
+                var controllerGenerator = new ControllerGenerator(configuration);
+                foreach (var file in controllerGenerator.Generate(document))
+                {
+                    generatedFiles.Add(new GeneratedFile(Path.GetFileName(file), File.ReadAllText(file)));
+                }
+            }
+
+            return new GeneratorRunResult { GeneratedSources = generatedFiles };
+        }
+        catch (Exception ex)
+        {
+            return new GeneratorRunResult
+            {
+                Errors = [$"TEKX0001: Error during OpenAPI processing for '{openApiFile}': {ex.Message}"],
+                Exception = ex
+            };
+        }
+        finally
+        {
+            if (Directory.Exists(outputDir))
+                Directory.Delete(outputDir, recursive: true);
+        }
     }
 
-    private static CSharpCompilation CreateCompilation()
+    private static bool GetBool(Dictionary<string, string> config, string key, bool defaultValue)
     {
-        var syntaxTree = CSharpSyntaxTree.ParseText("""
-                                                    namespace TestNamespace
-                                                    {
-                                                        public class TestClass { }
-                                                    }
-                                                    """);
+        return config.TryGetValue(key, out var value) && bool.TryParse(value, out var result) ? result : defaultValue;
+    }
 
-        var references = AppDomain.CurrentDomain.GetAssemblies()
-            .Where(a => !a.IsDynamic && !string.IsNullOrWhiteSpace(a.Location))
-            .Select(a => MetadataReference.CreateFromFile(a.Location))
-            .ToList();
+    private static string GetString(Dictionary<string, string> config, string key, string defaultValue)
+    {
+        return config.TryGetValue(key, out var value) && !string.IsNullOrWhiteSpace(value) ? value : defaultValue;
+    }
 
-        return CSharpCompilation.Create(
-            assemblyName: "TestAssembly",
-            syntaxTrees: [syntaxTree],
-            references: references,
-            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+    private static TEnum GetEnum<TEnum>(Dictionary<string, string> config, string key, TEnum defaultValue)
+        where TEnum : struct
+    {
+        return config.TryGetValue(key, out var value) && Enum.TryParse<TEnum>(value, true, out var result) ? result : defaultValue;
     }
 
     #endregion
@@ -253,79 +296,39 @@ public abstract class TestBase
     /// </summary>
     protected static void AssertNoErrors(GeneratorRunResult result, string message = "No errors should be generated")
     {
-        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
-        Assert.That(errors, Is.Empty, message);
+        Assert.That(result.Errors, Is.Empty, message);
     }
 
     /// <summary>
     /// Gets a generated source by hint name, asserting it exists
     /// </summary>
-    protected static GeneratedSourceResult GetGeneratedSource(GeneratorRunResult result, string hintName)
+    protected static GeneratedFile GetGeneratedSource(GeneratorRunResult result, string hintName)
     {
         var source = result.GeneratedSources.FirstOrDefault(s => s.HintName == hintName);
-        Assert.That(source.HintName, Is.Not.Null, $"The file '{hintName}' should be generated");
-        return source;
+        Assert.That(source, Is.Not.Null, $"The file '{hintName}' should be generated");
+        return source!;
     }
 
     #endregion
 
-    #region Test Helper Classes
+    #region Result Types
 
     protected class GeneratorRunResult
     {
-        public ImmutableArray<GeneratedSourceResult> GeneratedSources { get; set; }
-        public ImmutableArray<Diagnostic> Diagnostics { get; set; }
-        public Exception? Exception { get; set; }
+        public IReadOnlyList<GeneratedFile> GeneratedSources { get; init; } = [];
+        public IReadOnlyList<string> Errors { get; init; } = [];
+        public Exception? Exception { get; init; }
     }
 
-    private class TestAdditionalText : AdditionalText
+    protected class GeneratedFile(string hintName, string content)
     {
-        private readonly string _path;
-
-        public TestAdditionalText(string path)
-        {
-            _path = path;
-        }
-
-        public override string Path => _path;
-
-        public override SourceText GetText(CancellationToken cancellationToken = default)
-        {
-            return SourceText.From(!File.Exists(_path)
-                ? string.Empty
-                : File.ReadAllText(_path), Encoding.UTF8);
-        }
+        public string HintName { get; } = hintName;
+        public GeneratedSourceText SourceText { get; } = new GeneratedSourceText(content);
     }
 
-    private class TestAnalyzerConfigOptionsProvider : AnalyzerConfigOptionsProvider
+    protected class GeneratedSourceText(string text)
     {
-        private readonly TestAnalyzerConfigOptions _options;
-
-        public TestAnalyzerConfigOptionsProvider(string filePath, Dictionary<string, string> options)
-        {
-            _options = new TestAnalyzerConfigOptions(filePath, options);
-        }
-
-        public override AnalyzerConfigOptions GlobalOptions => _options;
-
-        public override AnalyzerConfigOptions GetOptions(SyntaxTree tree) => _options;
-
-        public override AnalyzerConfigOptions GetOptions(AdditionalText textFile) => _options;
-    }
-
-    private class TestAnalyzerConfigOptions : AnalyzerConfigOptions
-    {
-        private readonly Dictionary<string, string> _options;
-
-        public TestAnalyzerConfigOptions(string _, Dictionary<string, string> options)
-        {
-            _options = new Dictionary<string, string>(options);
-        }
-
-        public override bool TryGetValue(string key, out string value)
-        {
-            return _options.TryGetValue(key, out value!);
-        }
+        public override string ToString() => text;
     }
 
     #endregion

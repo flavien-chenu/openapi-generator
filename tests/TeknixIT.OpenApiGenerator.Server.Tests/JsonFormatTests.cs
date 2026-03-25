@@ -141,9 +141,9 @@ public class JsonFormatTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "simple-api.json");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.BaseNamespace"] = "MyApp";
-        config["build_metadata.AdditionalFiles.ContractsNamespace"] = "Models";
-        config["build_metadata.AdditionalFiles.ControllersNamespace"] = "Api";
+        config["BaseNamespace"] = "MyApp";
+        config["ContractsNamespace"] = "Models";
+        config["ControllersNamespace"] = "Api";
 
         // Act
         var result = RunGenerator(openApiFile, config);
@@ -167,7 +167,7 @@ public class JsonFormatTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "simple-api.json");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.GenerateControllers"] = "false";
+        config["GenerateControllers"] = "false";
 
         // Act
         var result = RunGenerator(openApiFile, config);
@@ -188,7 +188,7 @@ public class JsonFormatTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "simple-api.json");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.GenerateValidationAttributes"] = "false";
+        config["GenerateValidationAttributes"] = "false";
 
         // Act
         var result = RunGenerator(openApiFile, config);

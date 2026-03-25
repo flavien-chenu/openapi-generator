@@ -12,7 +12,7 @@ public class ValidationTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "validation-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.GenerateValidationAttributes"] = "true";
+        config["GenerateValidationAttributes"] = "true";
 
         // Act
         var result = RunGenerator(openApiFile, config);
@@ -39,7 +39,7 @@ public class ValidationTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "validation-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.GenerateValidationAttributes"] = "false";
+        config["GenerateValidationAttributes"] = "false";
 
         // Act
         var result = RunGenerator(openApiFile, config);
@@ -64,7 +64,7 @@ public class ValidationTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "validation-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.GenerateValidationAttributes"] = "true";
+        config["GenerateValidationAttributes"] = "true";
 
         // Act
         var result = RunGenerator(openApiFile, config);
@@ -93,7 +93,7 @@ public class ValidationTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "validation-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.GenerateValidationAttributes"] = "false";
+        config["GenerateValidationAttributes"] = "false";
 
         // Act
         var result = RunGenerator(openApiFile, config);

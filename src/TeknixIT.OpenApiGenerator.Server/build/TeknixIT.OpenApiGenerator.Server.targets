@@ -1,33 +1,25 @@
 <Project>
-  <ItemGroup>
-    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="SourceItemType" />
-    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="GenerateControllers" />
-    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="UseRecords" />
-    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="BaseNamespace" />
-    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="ContractsNamespace" />
-    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="ControllersNamespace" />
-    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="GenerateValidationAttributes" />
-    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="GenerateXmlDocumentation" />
-    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="UseAsyncControllers" />
-    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="AddApiControllerAttribute" />
-    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="ControllerBaseClass" />
-    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="ControllerGroupingStrategy" />
-  </ItemGroup>
-  <Target Name="_InjectTeknixITOpenApiGeneratorServerItems" BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun">
+  <UsingTask TaskName="OpenApiGeneratorTask"
+             AssemblyFile="$(MSBuildThisFileDirectory)../tasks/netstandard2.0/TeknixIT.OpenApiGenerator.Server.dll" />
+
+  <Target Name="RunTeknixITOpenApiGenerator"
+          BeforeTargets="CoreCompile"
+          Condition="'@(OpenApiGeneratorServer)' != ''">
+
+    <PropertyGroup>
+      <_OpenApiOutputDir>$(IntermediateOutputPath)OpenApiGenerated\</_OpenApiOutputDir>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(_OpenApiOutputDir)" />
+
+    <OpenApiGeneratorTask
+      OpenApiFiles="@(OpenApiGeneratorServer)"
+      OutputDirectory="$(_OpenApiOutputDir)">
+      <Output TaskParameter="GeneratedFiles" ItemName="_OpenApiGeneratedFiles" />
+    </OpenApiGeneratorTask>
+
     <ItemGroup>
-      <AdditionalFiles Include="@(OpenApiGeneratorServer)"
-                       SourceItemType="OpenApiGeneratorServer"
-                       GenerateControllers="%(OpenApiGeneratorServer.GenerateControllers)"
-                       UseRecords="%(OpenApiGeneratorServer.UseRecords)"
-                       BaseNamespace="%(OpenApiGeneratorServer.BaseNamespace)"
-                       ContractsNamespace="%(OpenApiGeneratorServer.ContractsNamespace)"
-                       ControllersNamespace="%(OpenApiGeneratorServer.ControllersNamespace)"
-                       GenerateValidationAttributes="%(OpenApiGeneratorServer.GenerateValidationAttributes)"
-                       GenerateXmlDocumentation="%(OpenApiGeneratorServer.GenerateXmlDocumentation)"
-                       UseAsyncControllers="%(OpenApiGeneratorServer.UseAsyncControllers)"
-                       AddApiControllerAttribute="%(OpenApiGeneratorServer.AddApiControllerAttribute)"
-                       ControllerBaseClass="%(OpenApiGeneratorServer.ControllerBaseClass)"
-                       ControllerGroupingStrategy="%(OpenApiGeneratorServer.ControllerGroupingStrategy)" />
+      <Compile Include="@(_OpenApiGeneratedFiles)" />
     </ItemGroup>
   </Target>
 </Project>

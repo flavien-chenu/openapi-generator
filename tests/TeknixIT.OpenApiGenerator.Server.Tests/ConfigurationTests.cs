@@ -12,9 +12,9 @@ public class ConfigurationTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "simple-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.BaseNamespace"] = "MyApp.Api";
-        config["build_metadata.AdditionalFiles.ContractsNamespace"] = "Models";
-        config["build_metadata.AdditionalFiles.ControllersNamespace"] = "Endpoints";
+        config["BaseNamespace"] = "MyApp.Api";
+        config["ContractsNamespace"] = "Models";
+        config["ControllersNamespace"] = "Endpoints";
 
         // Act
         var result = RunGenerator(openApiFile, config);
@@ -42,7 +42,7 @@ public class ConfigurationTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "simple-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.GenerateControllers"] = "false";
+        config["GenerateControllers"] = "false";
 
         // Act
         var result = RunGenerator(openApiFile, config);
@@ -65,7 +65,7 @@ public class ConfigurationTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "simple-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.UseAsyncControllers"] = "true";
+        config["UseAsyncControllers"] = "true";
 
         // Act
         var result = RunGenerator(openApiFile, config);
@@ -82,7 +82,7 @@ public class ConfigurationTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "simple-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.UseAsyncControllers"] = "false";
+        config["UseAsyncControllers"] = "false";
 
         // Act
         var result = RunGenerator(openApiFile, config);
@@ -100,7 +100,7 @@ public class ConfigurationTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "simple-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.AddApiControllerAttribute"] = "true";
+        config["AddApiControllerAttribute"] = "true";
 
         // Act
         var result = RunGenerator(openApiFile, config);
@@ -117,7 +117,7 @@ public class ConfigurationTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "simple-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.AddApiControllerAttribute"] = "false";
+        config["AddApiControllerAttribute"] = "false";
 
         // Act
         var result = RunGenerator(openApiFile, config);
@@ -136,7 +136,7 @@ public class ConfigurationTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "simple-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.ControllerBaseClass"] = "MyApp.Controllers.BaseApiController";
+        config["ControllerBaseClass"] = "MyApp.Controllers.BaseApiController";
 
         // Act
         var result = RunGenerator(openApiFile, config);

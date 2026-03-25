@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
 using Microsoft.OpenApi;
 
 namespace TeknixIT.OpenApiGenerator.Server.Controllers;
@@ -24,15 +23,15 @@ internal sealed class ControllerGenerator
     #region Public Methods
 
     /// <summary>
-    /// Generates controller code from an OpenAPI document.
+    /// Generates controller code from an OpenAPI document and writes files to disk.
     /// </summary>
     /// <param name="document">The OpenAPI document.</param>
-    /// <param name="context">The source production context.</param>
-    public void Generate(OpenApiDocument document, SourceProductionContext context)
+    /// <returns>Paths of the generated files.</returns>
+    public IEnumerable<string> Generate(OpenApiDocument document)
     {
         if (document.Paths.Count == 0)
         {
-            return;
+            yield break;
         }
 
         var controllerGroups = GroupPathsByController(document.Paths);
@@ -49,9 +48,9 @@ internal sealed class ControllerGenerator
             AppendNamespace(sb);
             GenerateController(sb, definition);
 
-            context.AddSource(
-                $"{definition.Name}Controller.g.cs",
-                SourceText.From(sb.ToString(), Encoding.UTF8));
+            var filePath = Path.Combine(_configuration.OutputDirectory, $"{definition.Name}Controller.g.cs");
+            File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
+            yield return filePath;
         }
     }
 

@@ -78,7 +78,7 @@ public class TypeMappingTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "types-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.GenerateXmlDocumentation"] = "true";
+        config["GenerateXmlDocumentation"] = "true";
 
         // Act
         var result = RunGenerator(openApiFile, config);
@@ -105,7 +105,7 @@ public class TypeMappingTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "types-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.UseRecords"] = "false";
+        config["UseRecords"] = "false";
 
         // Act
         var result = RunGenerator(openApiFile, config);

@@ -1,7 +1,7 @@
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
 using Microsoft.OpenApi;
 
 namespace TeknixIT.OpenApiGenerator.Server.Contracts;
@@ -21,15 +21,15 @@ internal sealed class ContractGenerator
     #region Public Methods
 
     /// <summary>
-    /// Generates contract code from an OpenAPI document.
+    /// Generates contract code from an OpenAPI document and writes files to disk.
     /// </summary>
     /// <param name="document">The OpenAPI document containing schemas.</param>
-    /// <param name="context">The source production context.</param>
-    public void Generate(OpenApiDocument document, SourceProductionContext context)
+    /// <returns>Paths of the generated files.</returns>
+    public IEnumerable<string> Generate(OpenApiDocument document)
     {
         if (document.Components?.Schemas == null || document.Components.Schemas.Count == 0)
         {
-            return;
+            yield break;
         }
 
         foreach (var schema in document.Components.Schemas)
@@ -50,9 +50,9 @@ internal sealed class ContractGenerator
             }
 
             var sanitizedName = SanitizeName(schema.Key);
-            context.AddSource(
-                $"{sanitizedName}.g.cs",
-                SourceText.From(sb.ToString(), Encoding.UTF8));
+            var filePath = Path.Combine(_configuration.OutputDirectory, $"{sanitizedName}.g.cs");
+            File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
+            yield return filePath;
         }
     }
 

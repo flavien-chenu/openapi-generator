@@ -296,7 +296,7 @@ public class ControllerGenerationTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "simple-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.UseAsyncControllers"] = "true";
+        config["UseAsyncControllers"] = "true";
 
         // Act
         var result = RunGenerator(openApiFile, config);
@@ -344,7 +344,7 @@ public class ControllerGenerationTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "simple-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.UseAsyncControllers"] = "false";
+        config["UseAsyncControllers"] = "false";
 
         // Act
         var result = RunGenerator(openApiFile, config);
@@ -392,7 +392,7 @@ public class ControllerGenerationTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "simple-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.AddApiControllerAttribute"] = "true";
+        config["AddApiControllerAttribute"] = "true";
 
         // Act
         var result = RunGenerator(openApiFile, config);
@@ -440,7 +440,7 @@ public class ControllerGenerationTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "simple-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.AddApiControllerAttribute"] = "false";
+        config["AddApiControllerAttribute"] = "false";
 
         // Act
         var result = RunGenerator(openApiFile, config);
@@ -487,7 +487,7 @@ public class ControllerGenerationTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "simple-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.ControllerBaseClass"] = "MyApp.Controllers.BaseApiController";
+        config["ControllerBaseClass"] = "MyApp.Controllers.BaseApiController";
 
         // Act
         var result = RunGenerator(openApiFile, config);

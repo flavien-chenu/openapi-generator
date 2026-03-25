@@ -1,5 +1,3 @@
-using Microsoft.CodeAnalysis;
-
 namespace TeknixIT.OpenApiGenerator.Server.Tests;
 
 /// <summary>
@@ -23,8 +21,7 @@ public class ErrorHandlingTests : TestBase
             var result = RunGenerator(invalidFile, config);
 
             // Assert
-            var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
-            Assert.That(errors, Is.Not.Empty, "Errors should be reported for an invalid file");
+            Assert.That(result.Errors, Is.Not.Empty, "Errors should be reported for an invalid file");
         }
         finally
         {
@@ -47,8 +44,7 @@ public class ErrorHandlingTests : TestBase
         var result = RunGenerator(nonExistentFile, config);
 
         // Assert
-        var errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
-        Assert.That(errors, Is.Not.Empty, "Errors should be reported for a non-existent file");
+        Assert.That(result.Errors, Is.Not.Empty, "Errors should be reported for a non-existent file");
     }
 
     [Test]

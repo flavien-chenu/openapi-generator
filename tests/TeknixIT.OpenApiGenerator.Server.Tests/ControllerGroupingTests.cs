@@ -12,7 +12,7 @@ public class ControllerGroupingTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "grouping-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.ControllerGroupingStrategy"] = "ByTag";
+        config["ControllerGroupingStrategy"] = "ByTag";
 
         // Act
         var result = RunGenerator(openApiFile, config);
@@ -45,7 +45,7 @@ public class ControllerGroupingTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "grouping-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.ControllerGroupingStrategy"] = "ByFirstPathSegment";
+        config["ControllerGroupingStrategy"] = "ByFirstPathSegment";
 
         // Act
         var result = RunGenerator(openApiFile, config);
@@ -79,7 +79,7 @@ public class ControllerGroupingTests : TestBase
         // Arrange
         var openApiFile = Path.Combine(TestDataDirectory, "grouping-api.yaml");
         var config = CreateDefaultConfiguration();
-        config["build_metadata.AdditionalFiles.ControllerGroupingStrategy"] = "ByPath";
+        config["ControllerGroupingStrategy"] = "ByPath";
 
         // Act
         var result = RunGenerator(openApiFile, config);
