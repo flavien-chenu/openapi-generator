@@ -36,7 +36,7 @@ public class ControllerGenerationTests : TestBase
                                                /// <summary>
                                                /// Controller for Users
                                                /// </summary>
-                                               [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                               [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                                [ApiController]
                                                [Route("/users")]
                                                public abstract class UsersControllerBase : ControllerBase
@@ -85,7 +85,7 @@ public class ControllerGenerationTests : TestBase
                                                   /// <summary>
                                                   /// Controller for Products
                                                   /// </summary>
-                                                  [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                                  [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                                   [ApiController]
                                                   [Route("/products")]
                                                   public abstract class ProductsControllerBase : ControllerBase
@@ -166,7 +166,7 @@ public class ControllerGenerationTests : TestBase
                                           /// <summary>
                                           /// Controller for Products
                                           /// </summary>
-                                          [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                          [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                           [ApiController]
                                           [Route("/products")]
                                           public abstract class ProductsControllerBase : ControllerBase
@@ -247,7 +247,7 @@ public class ControllerGenerationTests : TestBase
                                           /// <summary>
                                           /// Controller for Products
                                           /// </summary>
-                                          [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                          [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                           [ApiController]
                                           [Route("/products")]
                                           public abstract class ProductsControllerBase : ControllerBase
@@ -329,7 +329,7 @@ public class ControllerGenerationTests : TestBase
                                           /// <summary>
                                           /// Controller for Users
                                           /// </summary>
-                                          [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                          [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                           [ApiController]
                                           [Route("/users")]
                                           public abstract class UsersControllerBase : ControllerBase
@@ -379,7 +379,7 @@ public class ControllerGenerationTests : TestBase
                                           /// <summary>
                                           /// Controller for Users
                                           /// </summary>
-                                          [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                          [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                           [ApiController]
                                           [Route("/users")]
                                           public abstract class UsersControllerBase : ControllerBase
@@ -429,7 +429,7 @@ public class ControllerGenerationTests : TestBase
                                           /// <summary>
                                           /// Controller for Users
                                           /// </summary>
-                                          [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                          [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                           [ApiController]
                                           [Route("/users")]
                                           public abstract class UsersControllerBase : ControllerBase
@@ -479,7 +479,7 @@ public class ControllerGenerationTests : TestBase
                                           /// <summary>
                                           /// Controller for Users
                                           /// </summary>
-                                          [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                          [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                           [Route("/users")]
                                           public abstract class UsersControllerBase : ControllerBase
                                           {
@@ -528,7 +528,7 @@ public class ControllerGenerationTests : TestBase
                                           /// <summary>
                                           /// Controller for Users
                                           /// </summary>
-                                          [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                          [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                           [ApiController]
                                           [Route("/users")]
                                           public abstract class UsersControllerBase : MyApp.Controllers.BaseApiController
@@ -577,7 +577,7 @@ public class ControllerGenerationTests : TestBase
                                           /// <summary>
                                           /// Controller for Test
                                           /// </summary>
-                                          [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                          [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                           [ApiController]
                                           [Route("/test")]
                                           public abstract class TestControllerBase : ControllerBase

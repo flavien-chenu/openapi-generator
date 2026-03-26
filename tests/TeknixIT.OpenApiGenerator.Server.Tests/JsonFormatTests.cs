@@ -31,7 +31,7 @@ public class JsonFormatTests : TestBase
 
                                             namespace TestApp.Contracts;
 
-                                            [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                            [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                             public record User()
                                             {
                                                 [Required]

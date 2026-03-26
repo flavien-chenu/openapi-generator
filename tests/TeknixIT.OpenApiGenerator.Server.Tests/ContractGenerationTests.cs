@@ -31,7 +31,7 @@ public class ContractGenerationTests : TestBase
 
                                             namespace TestApp.Contracts;
 
-                                            [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                            [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                             public record User()
                                             {
                                                 [Required]
@@ -78,7 +78,7 @@ public class ContractGenerationTests : TestBase
 
                                        namespace TestApp.Contracts;
 
-                                       [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                       [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                        public record Product()
                                        {
                                            [Required]
@@ -113,7 +113,7 @@ public class ContractGenerationTests : TestBase
 
                                                     namespace TestApp.Contracts;
 
-                                                    [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                                    [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                                     public record CreateProductRequest()
                                                     {
                                                         [Required]
@@ -143,7 +143,7 @@ public class ContractGenerationTests : TestBase
 
                                                     namespace TestApp.Contracts;
 
-                                                    [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                                    [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                                     public record UpdateProductRequest()
                                                     {
                                                         [StringLength(100, MinimumLength = 1)]
@@ -188,7 +188,7 @@ public class ContractGenerationTests : TestBase
 
                                            namespace TestApp.Contracts;
 
-                                           [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                           [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                            public enum OrderStatus
                                            {
                                                /// <summary>
@@ -239,7 +239,7 @@ public class ContractGenerationTests : TestBase
 
                                         namespace TestApp.Contracts;
 
-                                        [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                        [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                         public enum Priority
                                         {
                                             /// <summary>
@@ -290,7 +290,7 @@ public class ContractGenerationTests : TestBase
 
                                              namespace TestApp.Contracts;
 
-                                             [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                             [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                              public enum PaymentMethod
                                              {
                                                  /// <summary>
@@ -341,7 +341,7 @@ public class ContractGenerationTests : TestBase
 
                                              namespace TestApp.Contracts;
 
-                                             [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                             [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                              public enum ProductStatus
                                              {
                                                  /// <summary>
@@ -393,7 +393,7 @@ public class ContractGenerationTests : TestBase
 
                                        namespace TestApp.Contracts;
 
-                                       [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                       [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                        public record Company()
                                        {
                                            [Required]
@@ -419,7 +419,7 @@ public class ContractGenerationTests : TestBase
 
                                        namespace TestApp.Contracts;
 
-                                       [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                       [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                        public record Address()
                                        {
                                            [Required]
@@ -448,7 +448,7 @@ public class ContractGenerationTests : TestBase
 
                                         namespace TestApp.Contracts;
 
-                                        [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                        [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                         public record Employee()
                                         {
                                             [Required]
@@ -490,7 +490,7 @@ public class ContractGenerationTests : TestBase
 
                                        namespace TestApp.Contracts;
 
-                                       [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                       [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                        public record Company()
                                        {
                                            [Required]
@@ -530,7 +530,7 @@ public class ContractGenerationTests : TestBase
 
                                        namespace TestApp.Contracts;
 
-                                       [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                       [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                        public record Product()
                                        {
                                            [Required]
@@ -579,7 +579,7 @@ public class ContractGenerationTests : TestBase
 
                                        namespace TestApp.Contracts;
 
-                                       [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
+                                       [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "1.0.0")]
                                        public record Product()
                                        {
                                            [Required]
