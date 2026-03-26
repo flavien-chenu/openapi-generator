@@ -78,6 +78,7 @@ internal sealed class ControllerGenerator
             : $"{_configuration.BaseNamespace}.{_configuration.ContractsNamespace}";
 
         sb.AppendLine("using System;");
+        sb.AppendLine("using System.CodeDom.Compiler;");
         sb.AppendLine("using System.Collections.Generic;");
         sb.AppendLine("using System.Threading.Tasks;");
         sb.AppendLine("using Microsoft.AspNetCore.Mvc;");
@@ -362,6 +363,8 @@ internal sealed class ControllerGenerator
     /// </summary>
     private void AppendControllerAttributes(StringBuilder sb, ControllerDefinition definition)
     {
+        sb.AppendLine($"[GeneratedCode(\"{Constants.CodeGeneration.GeneratedCodeTool}\", \"{Constants.CodeGeneration.GeneratedCodeVersion}\")]");
+
         if (_configuration.AddApiControllerAttribute)
         {
             sb.AppendLine("[ApiController]");

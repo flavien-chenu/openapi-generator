@@ -76,6 +76,7 @@ internal sealed class ContractGenerator
     private void AppendUsings(StringBuilder sb)
     {
         sb.AppendLine("using System;");
+        sb.AppendLine("using System.CodeDom.Compiler;");
         sb.AppendLine("using System.Collections.Generic;");
 
         if (_configuration.GenerateValidationAttributes)
@@ -118,6 +119,7 @@ internal sealed class ContractGenerator
     private void GenerateEnum(StringBuilder sb, string enumName, IOpenApiSchema schema)
     {
         AppendSchemaDocumentation(sb, schema);
+        sb.AppendLine($"[GeneratedCode(\"{Constants.CodeGeneration.GeneratedCodeTool}\", \"{Constants.CodeGeneration.GeneratedCodeVersion}\")]");
         sb.AppendLine($"public enum {SanitizeName(enumName)}");
         sb.AppendLine("{");
 
@@ -172,6 +174,7 @@ internal sealed class ContractGenerator
     /// </summary>
     private void AppendSchemaDeclaration(StringBuilder sb, string schemaName)
     {
+        sb.AppendLine($"[GeneratedCode(\"{Constants.CodeGeneration.GeneratedCodeTool}\", \"{Constants.CodeGeneration.GeneratedCodeVersion}\")]");
         var keyword = _configuration.UseRecords ? "record" : "class";
         sb.AppendLine($"public {keyword} {SanitizeName(schemaName)}()");
         sb.AppendLine("{");

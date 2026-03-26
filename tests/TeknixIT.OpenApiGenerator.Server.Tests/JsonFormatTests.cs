@@ -25,11 +25,13 @@ public class JsonFormatTests : TestBase
                                             #nullable enable
 
                                             using System;
+                                            using System.CodeDom.Compiler;
                                             using System.Collections.Generic;
                                             using System.ComponentModel.DataAnnotations;
 
                                             namespace TestApp.Contracts;
 
+                                            [GeneratedCode("TeknixIT.OpenApiGenerator.Server", "2.0.0")]
                                             public record User()
                                             {
                                                 [Required]
