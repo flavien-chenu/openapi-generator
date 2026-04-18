@@ -1,0 +1,91 @@
+openapi: 3.0.0
+info:
+  title: Path Level Parameters API
+  version: 1.0.0
+paths:
+  /brands/{brandId}:
+    parameters:
+      - name: brandId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Unique identifier of the brand.
+    get:
+      operationId: getBrand
+      tags:
+        - Brands
+      summary: Get a brand
+      description: Get an existing brand's details.
+      responses:
+        '200':
+          description: Brand retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandResponse'
+    put:
+      operationId: updateBrand
+      tags:
+        - Brands
+      summary: Update a brand
+      description: Updates an existing brand's details.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBrandRequest'
+      responses:
+        '200':
+          description: Brand updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandResponse'
+  /brands/{brandId}/items:
+    parameters:
+      - name: brandId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Unique identifier of the brand.
+    get:
+      operationId: getBrandItems
+      tags:
+        - Brands
+      summary: Get brand items
+      description: List items for a brand with optional filtering.
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Page number.
+      responses:
+        '200':
+          description: Items retrieved successfully.
+components:
+  schemas:
+    BrandResponse:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    UpdateBrandRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string

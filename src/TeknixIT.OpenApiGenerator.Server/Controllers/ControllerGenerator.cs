@@ -226,7 +226,7 @@ internal sealed class ControllerGenerator
         {
             foreach (var operation in pathItem.Operations ?? [])
             {
-                methods.Add(GetMethodDefinition(controller, operation.Key, operation.Value, path, document));
+                methods.Add(GetMethodDefinition(controller, operation.Key, operation.Value, path, document, pathItem.Parameters));
             }
         }
 
@@ -241,7 +241,8 @@ internal sealed class ControllerGenerator
         HttpMethod httpMethod,
         OpenApiOperation operation,
         string path,
-        OpenApiDocument document)
+        OpenApiDocument document,
+        IList<IOpenApiParameter>? pathItemParameters = null)
     {
         var route = controller.Route.Length > 0
             ? path.Replace(controller.Route, string.Empty)
@@ -262,7 +263,7 @@ internal sealed class ControllerGenerator
             Deprecated = operation.Deprecated
         };
 
-        AddOperationParameters(methodDefinition, operation);
+        AddOperationParameters(methodDefinition, operation, pathItemParameters);
         AddRequestBodyParameter(methodDefinition, operation, document);
 
         // Sort parameters according to C# conventions (required before optional, etc.)
@@ -274,15 +275,30 @@ internal sealed class ControllerGenerator
     /// <summary>
     /// Adds operation parameters to the method definition.
     /// </summary>
-    private static void AddOperationParameters(ControllerMethodDefinition methodDefinition, OpenApiOperation operation)
+    private static void AddOperationParameters(
+        ControllerMethodDefinition methodDefinition,
+        OpenApiOperation operation,
+        IList<IOpenApiParameter>? pathItemParameters = null)
     {
-        if (operation.Parameters == null)
+        // Merge path-level and operation-level parameters; operation-level takes precedence.
+        var operationParamNames = new HashSet<string>(
+            operation.Parameters?.Where(p => p.Name != null).Select(p => p.Name!) ?? [],
+            StringComparer.OrdinalIgnoreCase);
+
+        var merged = new List<IOpenApiParameter>();
+
+        if (pathItemParameters != null)
         {
-            return;
+            merged.AddRange(pathItemParameters.Where(p => !operationParamNames.Contains(p.Name ?? string.Empty)));
+        }
+
+        if (operation.Parameters != null)
+        {
+            merged.AddRange(operation.Parameters);
         }
 
         var i = 0;
-        foreach (var param in operation.Parameters)
+        foreach (var param in merged)
         {
             methodDefinition.Parameters.Add(new ControllerParameterDefinition
             {
