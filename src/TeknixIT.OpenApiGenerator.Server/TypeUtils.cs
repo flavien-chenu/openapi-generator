@@ -17,7 +17,8 @@ internal static class TypeUtils
     {
         var nullable = schema.Type?.HasFlag(JsonSchemaType.Null) ?? false;
 
-        if (schema.OneOf is { Count: 2 })
+        // oneOf with discriminator is polymorphism, not nullable
+        if (schema.OneOf is { Count: 2 } && !IsOneOfDiscriminated(schema))
         {
             nullable |= schema.OneOf.Any(s => s.Type?.HasFlag(JsonSchemaType.Null) == true);
         }
@@ -45,6 +46,17 @@ internal static class TypeUtils
     {
         while (true)
         {
+            // Handle oneOf + discriminator → return schema name directly (polymorphic abstract type)
+            if (IsOneOfDiscriminated(schema))
+            {
+                if (schema is OpenApiSchemaReference { Reference.Id: not null } discriminatedRef)
+                {
+                    return discriminatedRef.Reference.Id;
+                }
+                // Inline oneOf+discriminator without a ref — fallback to object
+                return "object";
+            }
+
             // Handle nullable types
             if (IsNullableType(schema) && !escapeNullable)
             {
@@ -107,6 +119,50 @@ internal static class TypeUtils
     private static IOpenApiSchema ResolveAllOf(IOpenApiSchema schema)
     {
         return schema.AllOf?.FirstOrDefault(s => s.Type != null) ?? schema;
+    }
+
+    /// <summary>
+    /// Determines if a schema is a oneOf + discriminator pattern (polymorphic abstract type).
+    /// </summary>
+    public static bool IsOneOfDiscriminated(IOpenApiSchema schema)
+    {
+        return schema is { OneOf.Count: > 0, Discriminator.PropertyName: not null };
+    }
+
+    /// <summary>
+    /// Determines if a schema is an allOf with a $ref parent and inline fragment (inheritance pattern).
+    /// </summary>
+    public static bool IsAllOfInherited(IOpenApiSchema schema)
+    {
+        if (schema.AllOf is not { Count: >= 2 })
+        {
+            return false;
+        }
+
+        var hasRef = schema.AllOf.Any(s => s is OpenApiSchemaReference);
+        var hasInline = schema.AllOf.Any(s => s is not OpenApiSchemaReference && s.Properties is { Count: > 0 });
+
+        return hasRef && hasInline;
+    }
+
+    /// <summary>
+    /// Extracts the $ref parent schema name from an allOf inheritance pattern.
+    /// </summary>
+    public static string? GetAllOfParentRefName(IOpenApiSchema schema)
+    {
+        var refSchema = schema.AllOf?.OfType<OpenApiSchemaReference>()
+            .FirstOrDefault();
+
+        return refSchema?.Reference.Id;
+    }
+
+    /// <summary>
+    /// Gets the inline fragment(s) from an allOf pattern.
+    /// </summary>
+    public static IOpenApiSchema? GetAllOfInlineFragment(IOpenApiSchema schema)
+    {
+        return schema.AllOf?
+            .FirstOrDefault(s => s is not OpenApiSchemaReference && s.Properties is { Count: > 0 });
     }
 
     /// <summary>

@@ -1,0 +1,109 @@
+openapi: 3.1.0
+info:
+  title: Polymorphism API
+  version: 1.0.0
+paths:
+  /categories/{categoryId}:
+    parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Unique identifier of the category.
+    get:
+      operationId: getCategory
+      tags:
+        - Categories
+      summary: Get a category
+      description: Get an existing category's details.
+      responses:
+        '200':
+          description: Success
+
+  /categories/{categoryId}/attributes:
+    parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      operationId: AddCategoryAttribute
+      tags:
+        - Categories
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCategoryAttributeRequest'
+      responses:
+        '200':
+          description: Success
+
+components:
+  schemas:
+    CategoryAttributeCreateBase:
+      type: object
+      required:
+        - code
+        - label
+        - isRequired
+      properties:
+        code:
+          type: string
+          maxLength: 100
+        label:
+          type: string
+          maxLength: 200
+        isRequired:
+          type: boolean
+
+    CreateCategoryAttributeRequest:
+      oneOf:
+        - $ref: '#/components/schemas/CreateTextCategoryAttributeRequest'
+        - $ref: '#/components/schemas/CreateIntegerCategoryAttributeRequest'
+      discriminator:
+        propertyName: type
+        mapping:
+          text: '#/components/schemas/CreateTextCategoryAttributeRequest'
+          integer: '#/components/schemas/CreateIntegerCategoryAttributeRequest'
+
+    CreateTextCategoryAttributeRequest:
+      allOf:
+        - $ref: '#/components/schemas/CategoryAttributeCreateBase'
+        - type: object
+          additionalProperties: false
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum: [ text ]
+            defaultValue:
+              type: [ string, 'null' ]
+            pattern:
+              type: [ string, 'null' ]
+            allowedValues:
+              type: [ array, 'null' ]
+              items:
+                type: string
+
+    CreateIntegerCategoryAttributeRequest:
+      allOf:
+        - $ref: '#/components/schemas/CategoryAttributeCreateBase'
+        - type: object
+          additionalProperties: false
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum: [ integer ]
+            minValue:
+              type: [ integer, 'null' ]
+            maxValue:
+              type: [ integer, 'null' ]

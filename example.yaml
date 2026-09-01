@@ -1,0 +1,1553 @@
+openapi: 3.1.1
+info:
+  title: Argon Catalog
+  description: Service for managing catalog items
+  version: '1'
+
+servers:
+  - url: https://argon.dev.teknixit.com/catalog
+    description: Development server
+
+security:
+  - oauth2:
+      - openid
+
+paths:
+  /v1/brands:
+    post:
+      operationId: createBrand
+      tags:
+        - Brands
+      summary: Create a brand
+      description: Creates a new brand that can be assigned to catalog products.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBrandRequest'
+      responses:
+        '201':
+          description: Brand created successfully.
+          headers:
+            Location:
+              description: Absolute URI of the created brand resource.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    get:
+      operationId: getBrands
+      tags:
+        - Brands
+      summary: Search brands
+      description: Returns a paginated and optionally filtered list of brands.
+      parameters:
+        - name: searchTerm
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Searches across name and website fields.
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filters brands by exact name match.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              pattern: '^(name|createdAt):(asc|desc)$'
+          description: Sort criteria.
+          style: form
+        - name: pageNumber
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+          description: Page number (1-based).
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Number of items per page.
+      responses:
+        '200':
+          description: Brands retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandPageResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/brands/{brandId}:
+    parameters:
+      - name: brandId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Unique identifier of the brand.
+
+    get:
+      operationId: getBrand
+      tags:
+        - Brands
+      summary: Get a brand
+      description: Get an existing brand's details.
+      responses:
+        '200':
+          description: Brand retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      operationId: updateBrand
+      tags:
+        - Brands
+      summary: Update a brand
+      description: Updates an existing brand's details.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBrandRequest'
+      responses:
+        '200':
+          description: Brand updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      operationId: deleteBrand
+      tags:
+        - Brands
+      summary: Delete a brand
+      description: Deletes an existing brand. The brand must not be assigned to any products.
+      responses:
+        '204':
+          description: Brand deleted successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/brands/delete:
+    post:
+      operationId: deleteBrands
+      tags:
+        - Brands
+      summary: Delete brands
+      description: Deletes brands in batch by their identifiers. The operation is idempotent.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteBrandsRequest'
+      responses:
+        '204':
+          description: Brands deleted successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/categories/root/tree:
+    get:
+      operationId: getRootCategoryTree
+      tags:
+        - Categories
+      summary: Get root category children trees
+      description: Returns children trees of root category and their descendants.
+      parameters:
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              pattern: '^(name|createdAt):(asc|desc)$'
+          description: Sort criteria for the subtree nodes.
+          style: form
+      responses:
+        '200':
+          description: Category tree retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryTreesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/categories/root/tree/children:
+    get:
+      operationId: getRootCategoryChildren
+      tags:
+        - Categories
+      summary: Get root category children
+      description: Returns children trees of root category without descendants.
+      parameters:
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              pattern: '^(name|createdAt):(asc|desc)$'
+          description: Sort criteria for the subtree nodes.
+          style: form
+      responses:
+        '200':
+          description: Category tree children retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryTreeItemResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/categories/root/tree/search:
+    get:
+      operationId: searchCategoryTree
+      tags:
+        - Categories
+      summary: Search category tree
+      description: Returns a subtree of the category hierarchy that includes categories matching the search term and their ancestors and descendants.
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Searches across name field to include matching categories and their ancestors and descendants.
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/CategoryStatus'
+          description: Filters categories by lifecycle status.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              pattern: '^(name|createdAt):(asc|desc)$'
+          description: Sort criteria.
+          style: form
+      responses:
+        '200':
+          description: Category tree retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoryTreeItemResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/categories:
+    get:
+      operationId: getCategories
+      tags:
+        - Categories
+      summary: Search categories
+      description: Returns a paginated and optionally filtered list of categories.
+      parameters:
+        - name: searchTerm
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Searches across name field.
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filters categories by exact name match.
+        - name: parentId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Filters categories by parent category identifier, or null for root categories.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              pattern: '^(name|createdAt):(asc|desc)$'
+          description: Sort criteria.
+          style: form
+        - name: pageNumber
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+          description: Page number (1-based).
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Number of items per page.
+      responses:
+        '200':
+          description: Categories retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryPageResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      operationId: createCategory
+      tags:
+        - Categories
+      summary: Create a category
+      description: Creates a new category, optionally nested under a parent category.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCategoryRequest'
+      responses:
+        '201':
+          description: Category created successfully.
+          headers:
+            Location:
+              description: Absolute URI of the created category resource.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/categories/{categoryId}:
+    parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Unique identifier of the category.
+
+    get:
+      operationId: getCategory
+      tags:
+        - Categories
+      summary: Get a category
+      description: Get an existing category's details.
+      responses:
+        '200':
+          description: Category retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      operationId: updateCategory
+      tags:
+        - Categories
+      summary: Update a category
+      description: Renames an existing category.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCategoryRequest'
+      responses:
+        '200':
+          description: category updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/categories/{categoryId}/archive:
+    parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Unique identifier of the category.
+
+    post:
+      operationId: archiveCategory
+      tags:
+        - Categories
+      summary: Archive a category
+      description: Archives an existing category. The category must have no active children.
+      responses:
+        '204':
+          description: category archived successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/categories/{categoryId}/restore:
+    parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Unique identifier of the category.
+
+    post:
+      operationId: restoreCategory
+      tags:
+        - Categories
+      summary: Restore a category
+      description: Restores an archived category back to active status.
+      responses:
+        '204':
+          description: Category restored successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/categories/{categoryId}/tree:
+    parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Unique identifier of the category.
+
+    get:
+      operationId: getCategoryTree
+      tags:
+        - Categories
+      summary: Get category subtree
+      description: Returns a subtree of the category hierarchy starting from the specified category.
+      parameters:
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              pattern: '^(name|createdAt):(asc|desc)$'
+          description: Sort criteria for the subtree nodes.
+          style: form
+      responses:
+        '200':
+          description: Category subtree retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryTreeItemResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/categories/{categoryId}/tree/children:
+    parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Unique identifier of the category.
+    get:
+      operationId: getCategoryChildren
+      tags:
+        - Categories
+      summary: Get category children
+      description: Returns children trees of the specified category without descendants.
+      parameters:
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              pattern: '^(name|createdAt):(asc|desc)$'
+          description: Sort criteria for the subtree nodes.
+          style: form
+      responses:
+        '200':
+          description: Category tree children retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryTreesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/categories/{categoryId}/attributes:
+    parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Unique identifier of the category.
+
+    post:
+      operationId: addCategoryAttribute
+      tags:
+        - Categories
+      summary: Add an attribute to a category
+      description: Adds a new attribute definition to the specified category.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCategoryAttributeRequest'
+      responses:
+        '201':
+          description: Attribute created successfully.
+          headers:
+            Location:
+              description: Absolute URI of the created attribute resource.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryAttributeResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/categories/{categoryId}/attributes/{attributeId}:
+    parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Unique identifier of the category.
+      - name: attributeId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Unique identifier of the attribute.
+
+    put:
+      operationId: updateCategoryAttribute
+      tags:
+        - Categories
+      summary: Update an attribute
+      description: Replaces the full definition of an existing attribute. The attribute type cannot be changed.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCategoryAttributeRequest'
+      responses:
+        '200':
+          description: Attribute updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryAttributeResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      operationId: removeCategoryAttribute
+      tags:
+        - Categories
+      summary: Remove an attribute from a category
+      description: Removes an attribute definition from the specified category.
+      responses:
+        '204':
+          description: Attribute removed successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      description: OAuth2 — Development environment
+      flows:
+        clientCredentials:
+          tokenUrl: https://argon.dev.teknixit.com/identity/v1/connect/token
+          scopes:
+            openid: Grants access to the OpenID scope for user authentication.
+
+  responses:
+    BadRequest:
+      description: Invalid request payload.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    Unauthorized:
+      description: Authentication is required.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    Conflict:
+      description: A resource with the same unique field already exists.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    UnprocessableEntity:
+      description: Validation errors on the submitted data.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationProblemDetails'
+    InternalServerError:
+      description: Unexpected server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+
+  schemas:
+    CreateBrandRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Human-friendly brand name.
+        website:
+          type: [ string, 'null' ]
+          format: uri
+          description: Optional canonical website for the brand.
+
+    UpdateBrandRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Human-friendly brand name.
+        website:
+          type: [ string, 'null' ]
+          format: uri
+          description: Optional canonical website for the brand.
+
+    DeleteBrandsRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - ids
+      properties:
+        ids:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            format: uuid
+          description: Identifiers of brands to delete.
+
+    BrandResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - name
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the brand.
+        name:
+          type: string
+          description: Display name of the brand.
+        website:
+          type: [ string, 'null' ]
+          description: Optional canonical website for the brand.
+        createdAt:
+          type: string
+          format: date-time
+          description: UTC timestamp when the brand was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: UTC timestamp of the last update.
+
+    BrandPageResponse:
+      type: object
+      required:
+        - items
+        - totalCount
+        - pageNumber
+        - pageSize
+        - totalPages
+        - hasNext
+        - hasPrevious
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BrandResponse'
+        totalCount:
+          type: integer
+          format: int32
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        hasNext:
+          type: boolean
+        hasPrevious:
+          type: boolean
+
+    CreateCategoryRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          maxLength: 200
+          description: Name of the category.
+        parentId:
+          type: [ string, 'null' ]
+          format: uuid
+          description: Optional parent category identifier.
+
+    UpdateCategoryRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          maxLength: 200
+          description: New name of the category.
+
+    CategoryTreesResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/CategoryTreeItemResponse'
+
+    CategoryTreeItemResponse:
+      type: object
+      required:
+        - id
+        - name
+        - status
+        - children
+        - hasChildren
+      properties:
+        id:
+          type: string
+          format: uuid
+        parentId:
+          type: [ string, 'null' ]
+          format: uuid
+        name:
+          type: string
+        status:
+          $ref: '#/components/schemas/CategoryStatus'
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryTreeItemResponse'
+        hasChildren:
+          type: boolean
+
+    CategoryPageResponse:
+      type: object
+      required:
+        - items
+        - totalCount
+        - pageNumber
+        - pageSize
+        - totalPages
+        - hasNext
+        - hasPrevious
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryResponse'
+        totalCount:
+          type: integer
+          format: int32
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        hasNext:
+          type: boolean
+        hasPrevious:
+          type: boolean
+
+    CategoryStatus:
+      type: string
+      enum:
+        - active
+        - archived
+      description: Lifecycle status of a category.
+
+    CategoryResponse:
+      type: object
+      required:
+        - id
+        - name
+        - status
+        - createdAt
+        - updatedAt
+        - attributes
+      properties:
+        id:
+          type: string
+          format: uuid
+        parentId:
+          type: [ string, 'null' ]
+          format: uuid
+        name:
+          type: string
+        status:
+          $ref: '#/components/schemas/CategoryStatus'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryAttributeResponse'
+
+    CategoryAttributeType:
+      type: string
+      enum:
+        - text
+        - integer
+        - float
+        - boolean
+        - list
+      description: Value type of a category attribute.
+
+    CategoryAttributeListType:
+      type: string
+      enum:
+        - text
+        - integer
+        - float
+        - boolean
+      description: Element type for list-type category attributes.
+
+    # -------------------------------------------------------------------------
+    # Shared base schemas
+    # -------------------------------------------------------------------------
+
+    CategoryAttributeCreateBase:
+      type: object
+      required:
+        - code
+        - label
+        - isRequired
+      properties:
+        code:
+          type: string
+          maxLength: 100
+          description: Unique code for the attribute within the category branch.
+        label:
+          type: string
+          maxLength: 200
+          description: Human-readable label for the attribute.
+        isRequired:
+          type: boolean
+          description: Whether the attribute is mandatory on products.
+
+    CategoryAttributeUpdateBase:
+      type: object
+      required:
+        - label
+        - isRequired
+      properties:
+        label:
+          type: string
+          maxLength: 200
+          description: Human-readable label for the attribute.
+        isRequired:
+          type: boolean
+          description: Whether the attribute is mandatory on products.
+
+    CategoryAttributeResponseBase:
+      type: object
+      required:
+        - id
+        - code
+        - label
+        - isRequired
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the attribute.
+        code:
+          type: string
+          description: Unique code for the attribute within the category branch.
+        label:
+          type: string
+          description: Human-readable label for the attribute.
+        isRequired:
+          type: boolean
+          description: Whether the attribute is mandatory on products.
+
+    # -------------------------------------------------------------------------
+    # Create request — discriminated by type
+    # -------------------------------------------------------------------------
+
+    CreateCategoryAttributeRequest:
+      oneOf:
+        - $ref: '#/components/schemas/CreateTextCategoryAttributeRequest'
+        - $ref: '#/components/schemas/CreateIntegerCategoryAttributeRequest'
+        - $ref: '#/components/schemas/CreateFloatCategoryAttributeRequest'
+        - $ref: '#/components/schemas/CreateBooleanCategoryAttributeRequest'
+        - $ref: '#/components/schemas/CreateListCategoryAttributeRequest'
+      discriminator:
+        propertyName: type
+        mapping:
+          text: '#/components/schemas/CreateTextCategoryAttributeRequest'
+          integer: '#/components/schemas/CreateIntegerCategoryAttributeRequest'
+          float: '#/components/schemas/CreateFloatCategoryAttributeRequest'
+          boolean: '#/components/schemas/CreateBooleanCategoryAttributeRequest'
+          list: '#/components/schemas/CreateListCategoryAttributeRequest'
+
+    CreateTextCategoryAttributeRequest:
+      allOf:
+        - $ref: '#/components/schemas/CategoryAttributeCreateBase'
+        - type: object
+          additionalProperties: false
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum: [ text ]
+            defaultValue:
+              type: [ string, 'null' ]
+              description: Default value applied when no value is provided.
+            pattern:
+              type: [ string, 'null' ]
+              description: PCRE regex pattern constraining accepted values.
+            allowedValues:
+              type: [ array, 'null' ]
+              items:
+                type: string
+              description: Restricts accepted values to this set.
+
+    CreateIntegerCategoryAttributeRequest:
+      allOf:
+        - $ref: '#/components/schemas/CategoryAttributeCreateBase'
+        - type: object
+          additionalProperties: false
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum: [ integer ]
+            defaultValue:
+              type: [ string, 'null' ]
+              description: Default value applied when no value is provided.
+            min:
+              type: [ number, 'null' ]
+              description: Minimum accepted value (inclusive).
+            max:
+              type: [ number, 'null' ]
+              description: Maximum accepted value (inclusive).
+            allowedValues:
+              type: [ array, 'null' ]
+              items:
+                type: string
+              description: Restricts accepted values to this set.
+
+    CreateFloatCategoryAttributeRequest:
+      allOf:
+        - $ref: '#/components/schemas/CategoryAttributeCreateBase'
+        - type: object
+          additionalProperties: false
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum: [ float ]
+            defaultValue:
+              type: [ string, 'null' ]
+              description: Default value applied when no value is provided.
+            min:
+              type: [ number, 'null' ]
+              description: Minimum accepted value (inclusive).
+            max:
+              type: [ number, 'null' ]
+              description: Maximum accepted value (inclusive).
+            allowedValues:
+              type: [ array, 'null' ]
+              items:
+                type: string
+              description: Restricts accepted values to this set.
+
+    CreateBooleanCategoryAttributeRequest:
+      allOf:
+        - $ref: '#/components/schemas/CategoryAttributeCreateBase'
+        - type: object
+          additionalProperties: false
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum: [ boolean ]
+            defaultValue:
+              type: [ string, 'null' ]
+              description: Default value applied when no value is provided.
+            allowedValues:
+              type: [ array, 'null' ]
+              items:
+                type: string
+              description: Restricts accepted values to this set (true / false).
+
+    CreateListCategoryAttributeRequest:
+      allOf:
+        - $ref: '#/components/schemas/CategoryAttributeCreateBase'
+        - type: object
+          additionalProperties: false
+          required:
+            - type
+            - listType
+          properties:
+            type:
+              type: string
+              enum: [ list ]
+            listType:
+              $ref: '#/components/schemas/CategoryAttributeListType'
+            allowedValues:
+              type: [ array, 'null' ]
+              items:
+                type: string
+              description: Restricts accepted values to this set.
+            defaultValues:
+              type: [ array, 'null' ]
+              items:
+                type: string
+              description: Default values applied when no value is provided.
+
+    # -------------------------------------------------------------------------
+    # Update request — discriminated by type (type is immutable, used as discriminant only)
+    # -------------------------------------------------------------------------
+
+    UpdateCategoryAttributeRequest:
+      oneOf:
+        - $ref: '#/components/schemas/UpdateTextCategoryAttributeRequest'
+        - $ref: '#/components/schemas/UpdateIntegerCategoryAttributeRequest'
+        - $ref: '#/components/schemas/UpdateFloatCategoryAttributeRequest'
+        - $ref: '#/components/schemas/UpdateBooleanCategoryAttributeRequest'
+        - $ref: '#/components/schemas/UpdateListCategoryAttributeRequest'
+      discriminator:
+        propertyName: type
+        mapping:
+          text: '#/components/schemas/UpdateTextCategoryAttributeRequest'
+          integer: '#/components/schemas/UpdateIntegerCategoryAttributeRequest'
+          float: '#/components/schemas/UpdateFloatCategoryAttributeRequest'
+          boolean: '#/components/schemas/UpdateBooleanCategoryAttributeRequest'
+          list: '#/components/schemas/UpdateListCategoryAttributeRequest'
+
+    UpdateTextCategoryAttributeRequest:
+      allOf:
+        - $ref: '#/components/schemas/CategoryAttributeUpdateBase'
+        - type: object
+          additionalProperties: false
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum: [ text ]
+            defaultValue:
+              type: [ string, 'null' ]
+              description: Default value applied when no value is provided.
+            pattern:
+              type: [ string, 'null' ]
+              description: PCRE regex pattern constraining accepted values.
+            allowedValues:
+              type: [ array, 'null' ]
+              items:
+                type: string
+              description: Restricts accepted values to this set.
+
+    UpdateIntegerCategoryAttributeRequest:
+      allOf:
+        - $ref: '#/components/schemas/CategoryAttributeUpdateBase'
+        - type: object
+          additionalProperties: false
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum: [ integer ]
+            defaultValue:
+              type: [ string, 'null' ]
+              description: Default value applied when no value is provided.
+            min:
+              type: [ number, 'null' ]
+              description: Minimum accepted value (inclusive).
+            max:
+              type: [ number, 'null' ]
+              description: Maximum accepted value (inclusive).
+            allowedValues:
+              type: [ array, 'null' ]
+              items:
+                type: string
+              description: Restricts accepted values to this set.
+
+    UpdateFloatCategoryAttributeRequest:
+      allOf:
+        - $ref: '#/components/schemas/CategoryAttributeUpdateBase'
+        - type: object
+          additionalProperties: false
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum: [ float ]
+            defaultValue:
+              type: [ string, 'null' ]
+              description: Default value applied when no value is provided.
+            min:
+              type: [ number, 'null' ]
+              description: Minimum accepted value (inclusive).
+            max:
+              type: [ number, 'null' ]
+              description: Maximum accepted value (inclusive).
+            allowedValues:
+              type: [ array, 'null' ]
+              items:
+                type: string
+              description: Restricts accepted values to this set.
+
+    UpdateBooleanCategoryAttributeRequest:
+      allOf:
+        - $ref: '#/components/schemas/CategoryAttributeUpdateBase'
+        - type: object
+          additionalProperties: false
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum: [ boolean ]
+            defaultValue:
+              type: [ string, 'null' ]
+              description: Default value applied when no value is provided.
+            allowedValues:
+              type: [ array, 'null' ]
+              items:
+                type: string
+              description: Restricts accepted values to this set (true / false).
+
+    UpdateListCategoryAttributeRequest:
+      allOf:
+        - $ref: '#/components/schemas/CategoryAttributeUpdateBase'
+        - type: object
+          additionalProperties: false
+          required:
+            - type
+            - listType
+          properties:
+            type:
+              type: string
+              enum: [ list ]
+            listType:
+              $ref: '#/components/schemas/CategoryAttributeListType'
+            allowedValues:
+              type: [ array, 'null' ]
+              items:
+                type: string
+              description: Restricts accepted values to this set.
+            defaultValues:
+              type: [ array, 'null' ]
+              items:
+                type: string
+              description: Default values applied when no value is provided.
+
+    # -------------------------------------------------------------------------
+    # Response — discriminated by type
+    # -------------------------------------------------------------------------
+
+    CategoryAttributeResponse:
+      oneOf:
+        - $ref: '#/components/schemas/TextCategoryAttributeResponse'
+        - $ref: '#/components/schemas/IntegerCategoryAttributeResponse'
+        - $ref: '#/components/schemas/FloatCategoryAttributeResponse'
+        - $ref: '#/components/schemas/BooleanCategoryAttributeResponse'
+        - $ref: '#/components/schemas/ListCategoryAttributeResponse'
+      discriminator:
+        propertyName: type
+        mapping:
+          text: '#/components/schemas/TextCategoryAttributeResponse'
+          integer: '#/components/schemas/IntegerCategoryAttributeResponse'
+          float: '#/components/schemas/FloatCategoryAttributeResponse'
+          boolean: '#/components/schemas/BooleanCategoryAttributeResponse'
+          list: '#/components/schemas/ListCategoryAttributeResponse'
+
+    TextCategoryAttributeResponse:
+      allOf:
+        - $ref: '#/components/schemas/CategoryAttributeResponseBase'
+        - type: object
+          additionalProperties: false
+          required:
+            - type
+            - allowedValues
+          properties:
+            type:
+              type: string
+              enum: [ text ]
+            defaultValue:
+              type: [ string, 'null' ]
+            pattern:
+              type: [ string, 'null' ]
+            allowedValues:
+              type: array
+              items:
+                type: string
+
+    IntegerCategoryAttributeResponse:
+      allOf:
+        - $ref: '#/components/schemas/CategoryAttributeResponseBase'
+        - type: object
+          additionalProperties: false
+          required:
+            - type
+            - allowedValues
+          properties:
+            type:
+              type: string
+              enum: [ integer ]
+            defaultValue:
+              type: [ string, 'null' ]
+            min:
+              type: [ number, 'null' ]
+            max:
+              type: [ number, 'null' ]
+            allowedValues:
+              type: array
+              items:
+                type: string
+
+    FloatCategoryAttributeResponse:
+      allOf:
+        - $ref: '#/components/schemas/CategoryAttributeResponseBase'
+        - type: object
+          additionalProperties: false
+          required:
+            - type
+            - allowedValues
+          properties:
+            type:
+              type: string
+              enum: [ float ]
+            defaultValue:
+              type: [ string, 'null' ]
+            min:
+              type: [ number, 'null' ]
+            max:
+              type: [ number, 'null' ]
+            allowedValues:
+              type: array
+              items:
+                type: string
+
+    BooleanCategoryAttributeResponse:
+      allOf:
+        - $ref: '#/components/schemas/CategoryAttributeResponseBase'
+        - type: object
+          additionalProperties: false
+          required:
+            - type
+            - allowedValues
+          properties:
+            type:
+              type: string
+              enum: [ boolean ]
+            defaultValue:
+              type: [ string, 'null' ]
+            allowedValues:
+              type: array
+              items:
+                type: string
+
+    ListCategoryAttributeResponse:
+      allOf:
+        - $ref: '#/components/schemas/CategoryAttributeResponseBase'
+        - type: object
+          additionalProperties: false
+          required:
+            - type
+            - listType
+            - allowedValues
+            - defaultValues
+          properties:
+            type:
+              type: string
+              enum: [ list ]
+            listType:
+              $ref: '#/components/schemas/CategoryAttributeListType'
+            allowedValues:
+              type: array
+              items:
+                type: string
+            defaultValues:
+              type: array
+              items:
+                type: string
+
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+      additionalProperties: true
+
+    ValidationProblemDetails:
+      allOf:
+        - $ref: '#/components/schemas/ProblemDetails'
+        - type: object
+          properties:
+            errors:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string

@@ -12,11 +12,49 @@ namespace TeknixIT.OpenApiGenerator.Server.Contracts;
 internal sealed class ContractGenerator
 {
     private readonly GeneratorConfiguration _configuration;
+    private Dictionary<string, SchemaMetadata> _schemaMetadata = new();
 
     public ContractGenerator(GeneratorConfiguration configuration)
     {
         _configuration = configuration;
     }
+
+    #region Schema Metadata
+
+    /// <summary>
+    /// Metadata about a schema's role in the inheritance hierarchy.
+    /// </summary>
+    private sealed class SchemaMetadata
+    {
+        /// <summary>True if the schema is a oneOf + discriminator pattern (Règle 1).</summary>
+        public bool IsOneOfDiscriminated { get; set; }
+
+        /// <summary>The discriminator property name (e.g. "type").</summary>
+        public string? DiscriminatorPropertyName { get; set; }
+
+        /// <summary>Mapping of discriminant value → schema name (e.g. "text" → "CreateTextCategoryAttributeRequest").</summary>
+        public Dictionary<string, string> DerivedTypeMapping { get; set; } = new();
+
+        /// <summary>The common allOf $ref base shared by all derived types (e.g. "CategoryAttributeCreateBase").</summary>
+        public string? CommonAllOfBaseName { get; set; }
+
+        /// <summary>True if the schema is an allOf with $ref + inline fragment (Règle 2).</summary>
+        public bool IsAllOfInherited { get; set; }
+
+        /// <summary>The $ref parent schema name from allOf.</summary>
+        public string? AllOfParentName { get; set; }
+
+        /// <summary>The resolved parent for C# inheritance (the oneOf root that references this type, if any).</summary>
+        public string? ResolvedParentName { get; set; }
+
+        /// <summary>True if the inline fragment has additionalProperties: false → sealed.</summary>
+        public bool IsSealed { get; set; }
+
+        /// <summary>Properties to skip because they are discriminant markers (Règle 5).</summary>
+        public HashSet<string> DiscriminatorPropertiesToSkip { get; set; } = new();
+    }
+
+    #endregion
 
     #region Public Methods
 
@@ -32,12 +70,17 @@ internal sealed class ContractGenerator
             yield break;
         }
 
+        // Pre-analysis pass: build metadata for all schemas
+        _schemaMetadata = AnalyzeSchemas(document.Components.Schemas);
+
         foreach (var schema in document.Components.Schemas)
         {
             var sb = new StringBuilder();
+            _schemaMetadata.TryGetValue(schema.Key, out var metadata);
+            var needsStjUsing = metadata?.IsOneOfDiscriminated == true;
 
             AppendFileHeader(sb);
-            AppendUsings(sb);
+            AppendUsings(sb, needsStjUsing);
             AppendNamespace(sb);
 
             if (IsEnumSchema(schema.Value))
@@ -46,7 +89,7 @@ internal sealed class ContractGenerator
             }
             else
             {
-                GenerateSchema(sb, schema.Key, schema.Value);
+                GenerateSchema(sb, schema.Key, schema.Value, metadata);
             }
 
             var sanitizedName = SanitizeName(schema.Key);
@@ -73,7 +116,7 @@ internal sealed class ContractGenerator
     /// <summary>
     /// Appends the required using statements.
     /// </summary>
-    private void AppendUsings(StringBuilder sb)
+    private void AppendUsings(StringBuilder sb, bool includeStjSerialization = false)
     {
         sb.AppendLine("using System;");
         sb.AppendLine("using System.CodeDom.Compiler;");
@@ -82,6 +125,11 @@ internal sealed class ContractGenerator
         if (_configuration.GenerateValidationAttributes)
         {
             sb.AppendLine("using System.ComponentModel.DataAnnotations;");
+        }
+
+        if (includeStjSerialization)
+        {
+            sb.AppendLine("using System.Text.Json.Serialization;");
         }
 
         sb.AppendLine();
@@ -144,13 +192,96 @@ internal sealed class ContractGenerator
     }
 
     /// <summary>
-    /// Generates a single schema (class or record).
+    /// Generates a single schema (class or record), dispatching to the appropriate generator
+    /// based on the schema's role in the polymorphism hierarchy.
     /// </summary>
-    private void GenerateSchema(StringBuilder sb, string schemaName, IOpenApiSchema schema)
+    private void GenerateSchema(StringBuilder sb, string schemaName, IOpenApiSchema schema, SchemaMetadata? metadata)
+    {
+        if (metadata?.IsOneOfDiscriminated == true)
+        {
+            GenerateAbstractDiscriminatedRecord(sb, schemaName, schema, metadata);
+        }
+        else if (metadata?.IsAllOfInherited == true)
+        {
+            GenerateConcreteInheritedRecord(sb, schemaName, schema, metadata);
+        }
+        else
+        {
+            GenerateStandardSchema(sb, schemaName, schema);
+        }
+    }
+
+    /// <summary>
+    /// Generates a standard schema (class or record) with no polymorphism.
+    /// </summary>
+    private void GenerateStandardSchema(StringBuilder sb, string schemaName, IOpenApiSchema schema)
     {
         AppendSchemaDocumentation(sb, schema);
         AppendSchemaDeclaration(sb, schemaName);
         AppendSchemaProperties(sb, schema);
+        sb.AppendLine("}");
+    }
+
+    /// <summary>
+    /// Generates an abstract record with [JsonPolymorphic] and [JsonDerivedType] attributes (Règle 1).
+    /// </summary>
+    private void GenerateAbstractDiscriminatedRecord(StringBuilder sb, string schemaName, IOpenApiSchema schema, SchemaMetadata metadata)
+    {
+        AppendSchemaDocumentation(sb, schema);
+
+        // [JsonPolymorphic] attribute
+        sb.AppendLine($"[JsonPolymorphic(TypeDiscriminatorPropertyName = \"{metadata.DiscriminatorPropertyName}\")]");
+
+        // [JsonDerivedType] for each mapping entry
+        foreach (var entry in metadata.DerivedTypeMapping)
+        {
+            var derivedTypeName = SanitizeName(entry.Value);
+            sb.AppendLine($"[JsonDerivedType(typeof({derivedTypeName}), \"{entry.Key}\")]");
+        }
+
+        sb.AppendLine($"[GeneratedCode(\"{Constants.CodeGeneration.GeneratedCodeTool}\", \"{Constants.CodeGeneration.GeneratedCodeVersion}\")]");
+        var keyword = _configuration.UseRecords ? "record" : "class";
+        var baseSuffix = metadata.CommonAllOfBaseName != null
+            ? $" : {SanitizeName(metadata.CommonAllOfBaseName)}"
+            : string.Empty;
+        sb.AppendLine($"public abstract {keyword} {SanitizeName(schemaName)}{baseSuffix};");
+    }
+
+    /// <summary>
+    /// Generates a concrete record inheriting from the abstract discriminated type (Règle 2).
+    /// Only properties from the inline fragment are generated; inherited properties come from the parent.
+    /// The discriminant property (Règle 5) is excluded.
+    /// </summary>
+    private void GenerateConcreteInheritedRecord(StringBuilder sb, string schemaName, IOpenApiSchema schema, SchemaMetadata metadata)
+    {
+        var parentName = metadata.ResolvedParentName ?? metadata.AllOfParentName;
+        var sealedModifier = metadata.IsSealed ? "sealed " : string.Empty;
+        var keyword = _configuration.UseRecords ? "record" : "class";
+
+        AppendSchemaDocumentation(sb, schema);
+        sb.AppendLine($"[GeneratedCode(\"{Constants.CodeGeneration.GeneratedCodeTool}\", \"{Constants.CodeGeneration.GeneratedCodeVersion}\")]");
+
+        var parentSuffix = parentName != null ? $" : {SanitizeName(parentName)}" : string.Empty;
+        sb.AppendLine($"public {sealedModifier}{keyword} {SanitizeName(schemaName)}{parentSuffix}");
+        sb.AppendLine("{");
+
+        // Get the inline fragment and generate only its properties
+        var inlineFragment = TypeUtils.GetAllOfInlineFragment(schema);
+        if (inlineFragment?.Properties != null)
+        {
+            foreach (var property in inlineFragment.Properties)
+            {
+                // Skip discriminant properties (Règle 5)
+                if (metadata.DiscriminatorPropertiesToSkip.Contains(property.Key))
+                {
+                    continue;
+                }
+
+                var isRequired = inlineFragment.Required?.Contains(property.Key) ?? false;
+                GenerateProperty(sb, property.Key, property.Value, isRequired);
+            }
+        }
+
         sb.AppendLine("}");
     }
 
@@ -170,7 +301,7 @@ internal sealed class ContractGenerator
     }
 
     /// <summary>
-    /// Appends the schema declaration (class or record).
+    /// Appends the schema declaration (class or record) for a standard schema.
     /// </summary>
     private void AppendSchemaDeclaration(StringBuilder sb, string schemaName)
     {
@@ -308,6 +439,204 @@ internal sealed class ContractGenerator
         var requiredModifier = isRequired ? "required " : string.Empty;
 
         sb.AppendLine($"{Constants.CodeGeneration.Indent}public {requiredModifier}{csharpType} {sanitizedName} {{ get; set; }}");
+    }
+
+    #endregion
+
+    #region Schema Analysis
+
+    /// <summary>
+    /// Analyzes all schemas to build metadata for polymorphism support.
+    /// </summary>
+    private static Dictionary<string, SchemaMetadata> AnalyzeSchemas(
+        IDictionary<string, IOpenApiSchema> schemas)
+    {
+        var metadata = new Dictionary<string, SchemaMetadata>();
+
+        // First pass: identify oneOf+discriminator schemas and allOf-inherited schemas
+        foreach (var schemaEntry in schemas)
+        {
+            var name = schemaEntry.Key;
+            var schema = schemaEntry.Value;
+            var meta = new SchemaMetadata();
+
+            if (schema.Discriminator is not null && TypeUtils.IsOneOfDiscriminated(schema))
+            {
+                meta.IsOneOfDiscriminated = true;
+                meta.DiscriminatorPropertyName = schema.Discriminator.PropertyName;
+                meta.DerivedTypeMapping = BuildDerivedTypeMapping(schema);
+            }
+            else if (TypeUtils.IsAllOfInherited(schema))
+            {
+                meta.IsAllOfInherited = true;
+                meta.AllOfParentName = TypeUtils.GetAllOfParentRefName(schema);
+
+                // Check if sealed (additionalProperties: false on inline fragment)
+                var inline = TypeUtils.GetAllOfInlineFragment(schema);
+                if (inline?.AdditionalProperties != null)
+                {
+                    // In OpenAPI 3.1, additionalProperties can be a schema or a boolean.
+                    // When it's `false`, the library may represent it differently.
+                    // We check AdditionalPropertiesAllowed for the boolean case.
+                    meta.IsSealed = !schema.AdditionalPropertiesAllowed;
+                }
+                else if (inline != null)
+                {
+                    // Also check the inline fragment directly
+                    meta.IsSealed = !inline.AdditionalPropertiesAllowed;
+                }
+            }
+
+            metadata[name] = meta;
+        }
+
+        // Second pass: resolve parent references for allOf schemas
+        // If a concrete type is listed in a oneOf's entries, its C# parent is the oneOf abstract type
+        var oneOfParentMap = BuildOneOfParentMap(metadata);
+
+        foreach (var metaEntry in metadata)
+        {
+            var name = metaEntry.Key;
+            var meta = metaEntry.Value;
+
+            if (!meta.IsAllOfInherited)
+            {
+                continue;
+            }
+
+            // Check if this schema is referenced by a oneOf+discriminator schema
+            if (oneOfParentMap.TryGetValue(name, out var oneOfParentName))
+            {
+                meta.ResolvedParentName = oneOfParentName;
+            }
+            else
+            {
+                // Otherwise, inherit from the allOf $ref parent
+                meta.ResolvedParentName = meta.AllOfParentName;
+            }
+
+            // Identify discriminant properties to skip (Règle 5)
+            var parentOneOfName = meta.ResolvedParentName;
+            if (parentOneOfName != null && metadata.TryGetValue(parentOneOfName, out var parentMeta)
+                                        && parentMeta.IsOneOfDiscriminated
+                                        && parentMeta.DiscriminatorPropertyName != null)
+            {
+                var inline = schemas.TryGetValue(name, out var s) ? TypeUtils.GetAllOfInlineFragment(s) : null;
+                if (inline?.Properties != null)
+                {
+                    var discriminatorPropName = parentMeta.DiscriminatorPropertyName;
+                    if (inline.Properties.TryGetValue(discriminatorPropName, out var propSchema))
+                    {
+                        // It's a discriminant property if it has an enum with exactly one value
+                        if (propSchema.Enum is { Count: 1 })
+                        {
+                            meta.DiscriminatorPropertiesToSkip.Add(discriminatorPropName);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Third pass: resolve common allOf base for oneOf+discriminator schemas
+        // If all derived types share the same allOf $ref base, the abstract record inherits from it
+        foreach (var metaEntry in metadata)
+        {
+            var meta = metaEntry.Value;
+            if (!meta.IsOneOfDiscriminated || meta.DerivedTypeMapping.Count == 0)
+            {
+                continue;
+            }
+
+            string? commonBase = null;
+            var allShareSameBase = true;
+
+            foreach (var derivedName in meta.DerivedTypeMapping.Values)
+            {
+                if (!metadata.TryGetValue(derivedName, out var derivedMeta) || !derivedMeta.IsAllOfInherited)
+                {
+                    allShareSameBase = false;
+                    break;
+                }
+
+                if (commonBase == null)
+                {
+                    commonBase = derivedMeta.AllOfParentName;
+                }
+                else if (commonBase != derivedMeta.AllOfParentName)
+                {
+                    allShareSameBase = false;
+                    break;
+                }
+            }
+
+            if (allShareSameBase && commonBase != null)
+            {
+                meta.CommonAllOfBaseName = commonBase;
+            }
+        }
+
+        return metadata;
+    }
+
+    /// <summary>
+    /// Builds the derived type mapping from a oneOf+discriminator schema.
+    /// Uses discriminator.mapping if present, otherwise infers from $ref names.
+    /// </summary>
+    private static Dictionary<string, string> BuildDerivedTypeMapping(IOpenApiSchema schema)
+    {
+        var mapping = new Dictionary<string, string>();
+
+        if (schema.Discriminator?.Mapping is { Count: > 0 } explicitMapping)
+        {
+            foreach (var entry in explicitMapping)
+            {
+                // Mapping value is an OpenApiSchemaReference — extract the reference ID
+                var refName = entry.Value?.Reference.Id ?? entry.Key;
+                mapping[entry.Key] = refName;
+            }
+        }
+        else if (schema.OneOf != null)
+        {
+            // Fallback: infer discriminant values from $ref names
+            foreach (var oneOfEntry in schema.OneOf)
+            {
+                if (oneOfEntry is OpenApiSchemaReference { Reference.Id: not null } refSchema)
+                {
+                    // Use the lowercase schema name as discriminant value
+                    var name = refSchema.Reference.Id;
+                    mapping[name.ToLowerInvariant()] = name;
+                }
+            }
+        }
+
+        return mapping;
+    }
+
+    /// <summary>
+    /// Builds a map from derived schema name → oneOf parent schema name.
+    /// This allows resolving which abstract type a concrete type should inherit from.
+    /// </summary>
+    private static Dictionary<string, string> BuildOneOfParentMap(Dictionary<string, SchemaMetadata> metadata)
+    {
+        var map = new Dictionary<string, string>();
+
+        foreach (var metaEntry in metadata)
+        {
+            var parentName = metaEntry.Key;
+            var meta = metaEntry.Value;
+
+            if (!meta.IsOneOfDiscriminated)
+            {
+                continue;
+            }
+
+            foreach (var derivedName in meta.DerivedTypeMapping.Values)
+            {
+                map[derivedName] = parentName;
+            }
+        }
+
+        return map;
     }
 
     #endregion

@@ -104,17 +104,22 @@ public class OpenApiGeneratorTask : Task
 
         if (document == null || (diagnostic != null && diagnostic.Errors.Any()))
         {
-            Log.LogWarning(
+            Log.LogError(
                 subcategory: null,
-                warningCode: "TEKX0002",
+                errorCode: "TEKX0002",
                 helpKeyword: null,
                 file: configuration.OpenApiFile,
                 lineNumber: 0,
                 columnNumber: 0,
                 endLineNumber: 0,
                 endColumnNumber: 0,
-                message: "Unable to parse OpenAPI document: {0}",
-                messageArgs: [configuration.OpenApiFile]);
+                message: "Unable to parse OpenAPI document: {0}.\nDetails:\n\t{1}",
+                messageArgs:
+                [
+                    configuration.OpenApiFile,
+                    diagnostic != null ? string.Join("\n\t", diagnostic.Errors.Select(e => $"{e.Pointer}: {e.Message}")) : "No diagnostic information available."
+                ]
+            );
             return [];
         }
 
